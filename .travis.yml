@@ -1,2 +1,6 @@
-language: java
-script: build.sh
+language: android
+android:
+  components:
+    build-tools-25.0.0
+    android-25
+install: ./gradlew build
