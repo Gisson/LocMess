@@ -3,4 +3,4 @@ language: android
 #  components:
  #   build-tools-25.0.0
 #    android-25
-script: build.sh
+script: ./build.sh
