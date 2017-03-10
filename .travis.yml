@@ -8,8 +8,10 @@ android:
     - platform-tools
     - extra-android-support
     - extra-google-google_play_services
-    - android-25
+    - android-16
+    - android-21
     - android-22
+    - android-25
 jdk: oraclejdk8
 #android:
 #  components:
