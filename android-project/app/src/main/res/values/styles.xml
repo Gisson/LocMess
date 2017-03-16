@@ -12,7 +12,6 @@
         <item name="android:windowBackground">@color/background</item>
 
 
-
     </style>
 
     <style name="FullscreenTheme" parent="AppTheme">
@@ -40,5 +39,14 @@
     <style name="ActionBarStyle" parent="Widget.AppCompat.ActionBar">
 
     </style>
+
+    <style name="AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
 </resources>
