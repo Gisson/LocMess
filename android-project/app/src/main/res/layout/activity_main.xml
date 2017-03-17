@@ -14,17 +14,6 @@
     <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:inputType="textPassword"
-        android:ems="10"
-        android:layout_below="@+id/username_input"
-        android:layout_alignRight="@+id/username_input"
-        android:layout_alignEnd="@+id/username_input"
-        android:layout_marginTop="26dp"
-        android:id="@+id/password_input" />
-
-    <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:inputType="textPersonName"
         android:ems="10"
         android:id="@+id/username_input"
@@ -34,6 +23,17 @@
         android:layout_alignParentEnd="true"
         android:layout_marginRight="36dp"
         android:layout_marginEnd="36dp" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="textPassword"
+        android:ems="10"
+        android:layout_below="@+id/username_input"
+        android:layout_alignRight="@+id/username_input"
+        android:layout_alignEnd="@+id/username_input"
+        android:layout_marginTop="26dp"
+        android:id="@+id/password_input" />
 
     <TextView
         android:text="Username: "
@@ -71,7 +71,8 @@
         android:id="@+id/login_button"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="23dp" />
+        android:layout_marginBottom="23dp"
+        android:onClick="login" />
 
     <Button
         android:text="Register"
