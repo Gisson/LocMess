@@ -29,6 +29,15 @@
             android:name=".LocationsMenuActivity"
             android:label="@string/title_activity_locations_menu"
             android:theme="@style/AppTheme.NoActionBar"></activity>
+
+        <activity android:name=".MyMessagesMenuActivity"
+            android:theme="@style/AppTheme.NoActionBar"/>
+
+        <activity android:name=".NewMessageActivity"/>
+
+        <activity android:name=".SelectPolicyActivity"/>
+
+        <activity android:name=".AddLocationActivity"/>
     </application>
 
 </manifest>

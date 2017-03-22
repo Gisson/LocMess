@@ -29,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
         System.out.println(((EditText)findViewById(R.id.username_input)).getText().toString());
         /*This should just actually do some checks with the server in an assyncthread but for now it's k babe*/
         if(((EditText)findViewById(R.id.username_input)).getText().toString().equals("Donald") &&
-        ((EditText)findViewById(R.id.username_input)).getText().toString().equals("America" )){
+        ((EditText)findViewById(R.id.password_input)).getText().toString().equals("America" )){
             Intent i=new Intent(this,LocationsMenuActivity.class);
             startActivity(i);
         }
