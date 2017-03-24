@@ -13,6 +13,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
+import android.widget.Toast;
 
 public class MyMessagesMenuActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener{
@@ -62,17 +63,15 @@ public class MyMessagesMenuActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
+        if (id == R.id.nav_profile) {
+            // Actully do Nothing
+        } else if (id == R.id.nav_my_messages) {
 
-        } else if (id == R.id.nav_slideshow) {
+        } else if (id == R.id.nav_help) {
+            Toast.makeText(getApplication().getBaseContext(),"No help lel",Toast.LENGTH_SHORT).show();
 
-        } else if (id == R.id.nav_manage) {
 
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
+        } else if (id == R.id.nav_logout) {
 
         }
 

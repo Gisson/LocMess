@@ -12,28 +12,30 @@
     tools:context="pt.ulisboa.tecnico.ist.cmu.locmess.MainActivity">
 
     <EditText
+        android:id="@+id/username_input"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:inputType="textPersonName"
-        android:ems="10"
-        android:id="@+id/username_input"
-        android:layout_marginTop="94dp"
-        android:layout_below="@+id/logo"
-        android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/logo"
+        android:layout_marginEnd="36dp"
         android:layout_marginRight="36dp"
-        android:layout_marginEnd="36dp" />
+        android:layout_marginTop="94dp"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:text="Donald" />
 
     <EditText
+        android:id="@+id/password_input"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:inputType="textPassword"
-        android:ems="10"
-        android:layout_below="@+id/username_input"
-        android:layout_alignRight="@+id/username_input"
         android:layout_alignEnd="@+id/username_input"
+        android:layout_alignRight="@+id/username_input"
+        android:layout_below="@+id/username_input"
         android:layout_marginTop="26dp"
-        android:id="@+id/password_input" />
+        android:ems="10"
+        android:inputType="textPassword"
+        android:text="America" />
 
     <TextView
         android:text="Username: "
