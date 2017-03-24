@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/content_edit_policy"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="pt.ulisboa.tecnico.ist.cmu.locmess.EditPolicyActivity"
+    tools:showIn="@layout/activity_edit_policy">
+
+
+    <RadioGroup
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:id="@+id/radioGroup"
+        android:weightSum="1">
+
+        <TextView
+            android:text="Policy filter type"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/tvPolicyLegend" />
+
+        <RadioButton
+            android:text="White List"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/rbWhiteList"
+            android:onClick="onRadioButtonClicked" />
+
+        <RadioButton
+            android:text="Black List"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/rbBlackList"
+            android:onClick="onRadioButtonClicked" />
+
+    </RadioGroup>
+    <!-- the list view must be populated in Java, I think -->
+
+    <Space
+        android:layout_below="@+id/radioGroup"
+        android:id="@+id/space"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        android:layout_below="@+id/space"
+        android:id="@+id/tvTopics"
+        android:text="Filter by these Topics"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <ListView
+        android:layout_below="@+id/tvTopics"
+        android:id="@+id/lvTopics"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:contentDescription="filter topics" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/abAddTopic"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/fab_margin"
+        app:backgroundTint="@color/colorPrimary"
+        app:srcCompat="@android:drawable/ic_menu_add"
+        android:layout_alignParentBottom="true"
+        android:layout_alignEnd="@+id/lvTopics"
+        android:layout_alignRight="@+id/lvTopics" />
+</RelativeLayout>

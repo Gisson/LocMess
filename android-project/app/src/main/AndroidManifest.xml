@@ -38,6 +38,17 @@
         <activity android:name=".SelectPolicyActivity"/>
 
         <activity android:name=".AddLocationActivity"/>
+
+        <activity
+            android:name=".EditPolicyActivity"
+            android:parentActivityName=".NewMessageActivity"
+            android:label="@string/title_activity_edit_policy"
+            android:theme="@style/AppTheme.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter></activity>
     </application>
 
 </manifest>

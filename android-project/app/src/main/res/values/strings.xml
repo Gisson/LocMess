@@ -22,4 +22,5 @@
     <string name="latitude">Latitude:</string>
     <string name="longtitude">Longtitude:</string>
     <string name="radius">Radius:</string>
+    <string name="title_activity_edit_policy">Edit Policy</string>
 </resources>
