@@ -3,6 +3,7 @@ package pt.ulisboa.tecnico.ist.cmu.locmess.topics;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -116,6 +117,19 @@ public class TopicsListAdapter extends BaseAdapter {
                 // if the dialog was shown for a new item, it might be empty
                 if(text.isEmpty()){ // FIXME this should be abstracted by a Topic class or something
                     topics.remove(index);
+                    TopicsListAdapter.this.notifyDataSetChanged();
+                }
+            }
+        });
+        builder.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialogInterface) {
+                Log.d(TAG, "DialogInterface onCancel");
+                String text = dialogText.getText().toString();
+                // if the dialog was shown for a new item, it might be empty
+                if(text.isEmpty()){ // FIXME this should be abstracted by a Topic class or something
+                    topics.remove(index);
+                    TopicsListAdapter.this.notifyDataSetChanged();
                 }
             }
         });
