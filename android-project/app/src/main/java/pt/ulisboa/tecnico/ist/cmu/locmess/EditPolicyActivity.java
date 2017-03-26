@@ -2,22 +2,25 @@ package pt.ulisboa.tecnico.ist.cmu.locmess;
 
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.RadioButton;
-import android.widget.RadioGroup;
-import android.widget.TextView;
-import android.widget.Toast;
 
-import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Arrays;
+
+import pt.ulisboa.tecnico.ist.cmu.locmess.topics.TopicsListAdapter;
 
 public class EditPolicyActivity extends AppCompatActivity {
     private static final String TAG = "EditPolicyActivity";
+
+    /* FIXME implement a Topic DTO :) */
+    private static final String[] mockTopics = {"os=linux", "university=ist", "club=none"};
+    private ArrayList<String> topics = new ArrayList<String>(Arrays.asList(mockTopics));
+    private TopicsListAdapter topicsAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,19 +34,16 @@ public class EditPolicyActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Adding a new policy is not yet implemented", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                Log.v(TAG, "Action Button clicked");
+                topicsAdapter.showAddTopicDialog();
             }
         });
 
-        /* FIXME implement a Topic DTO :) */
-        String[] topics = {"os=linux", "university=ist", "club=none"};
-        ArrayAdapter<String> topicsAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, topics);
+        topicsAdapter = new TopicsListAdapter(topics, this);
 
         ListView lvTopics = (ListView)findViewById(R.id.lvTopics);
         lvTopics.setAdapter(topicsAdapter);
     }
-
 
     public void onRadioButtonClicked(View view) {
         boolean checked = ((RadioButton) view).isChecked();
