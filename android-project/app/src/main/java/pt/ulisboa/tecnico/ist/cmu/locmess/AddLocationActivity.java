@@ -10,7 +10,7 @@ import android.widget.EditText;
 
 public class AddLocationActivity extends AppCompatActivity {
 
-    EditText nameEt, latEt, lonEt, radiusEt;
+    EditText nameEt, gpsEt, ssidEt, bssidEt;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -22,9 +22,9 @@ public class AddLocationActivity extends AppCompatActivity {
         setContentView(R.layout.activity_add_location);
 
         nameEt = (EditText) findViewById(R.id.name_et);
-        latEt = (EditText) findViewById(R.id.lat_et);
-        lonEt = (EditText) findViewById(R.id.lon_et);
-        radiusEt = (EditText) findViewById(R.id.radius_et);
+        gpsEt = (EditText) findViewById(R.id.gps_coords_et);
+        ssidEt = (EditText) findViewById(R.id.ssid_et);
+        bssidEt = (EditText) findViewById(R.id.bssid_et);
     }
 
     @Override
@@ -41,9 +41,9 @@ public class AddLocationActivity extends AppCompatActivity {
             //here go back to locations and get data
             Intent i = new Intent(AddLocationActivity.this, LocationsMenuActivity.class);
             i.putExtra("name", nameEt.getText().toString());
-            i.putExtra("lat", latEt.getText().toString());
-            i.putExtra("lon", lonEt.getText().toString());
-            i.putExtra("radius", radiusEt.getText().toString());
+            i.putExtra("gps", gpsEt.getText().toString());
+            i.putExtra("ssid", ssidEt.getText().toString());
+            i.putExtra("bssid", bssidEt.getText().toString());
             i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(i);

@@ -39,42 +39,61 @@
 
         <EditText
             android:inputType="text"
+            android:imeOptions="actionNext"
             android:id="@+id/name_et"
             android:layout_width="200dp"
             android:layout_height="wrap_content"/>
 
         <TextView
-            android:text="@string/latitude"
+            android:text="@string/gps_coordinates"
             android:layout_width="100dp"
             android:layout_height="wrap_content"/>
 
         <EditText
+            android:hint="@string/gps_et_hint"
+            android:imeOptions="actionNext"
             android:inputType="numberDecimal"
-            android:id="@+id/lat_et"
+            android:digits="0123456789,."
+            android:id="@+id/gps_coords_et"
             android:layout_width="200dp"
             android:layout_height="wrap_content"/>
 
         <TextView
-            android:text="@string/longtitude"
+            android:text="@string/ssid"
             android:layout_width="100dp"
             android:layout_height="wrap_content"/>
 
         <EditText
-            android:inputType="numberDecimal"
-            android:id="@+id/lon_et"
+            android:hint="@string/ssid_et_hint"
+            android:imeOptions="actionNext"
+            android:inputType="text"
+            android:id="@+id/ssid_et"
             android:layout_width="200dp"
             android:layout_height="wrap_content"/>
 
         <TextView
-            android:text="@string/radius"
+            android:text="@string/bssid"
             android:layout_width="100dp"
             android:layout_height="wrap_content"/>
 
         <EditText
-            android:inputType="number"
-            android:id="@+id/radius_et"
+            android:hint="@string/bssid_et_hint"
+            android:imeOptions="actionDone"
+            android:inputType="text"
+            android:id="@+id/bssid_et"
             android:layout_width="200dp"
             android:layout_height="wrap_content"/>
+
+        <!--<TextView-->
+            <!--android:text="@string/radius"-->
+            <!--android:layout_width="100dp"-->
+            <!--android:layout_height="wrap_content"/>-->
+
+        <!--<EditText-->
+            <!--android:inputType="number"-->
+            <!--android:id="@+id/radius_et"-->
+            <!--android:layout_width="200dp"-->
+            <!--android:layout_height="wrap_content"/>-->
 
     </GridLayout>
 

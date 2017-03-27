@@ -23,4 +23,10 @@
     <string name="longtitude">Longtitude:</string>
     <string name="radius">Radius:</string>
     <string name="title_activity_edit_policy">Edit Policy</string>
+    <string name="gps_coordinates">GPS Coordinates:</string>
+    <string name="ssid">SSID:</string>
+    <string name="bssid">BSSID:</string>
+    <string name="gps_et_hint">Longtitude, Latitude, Radius</string>
+    <string name="ssid_et_hint">Eduroam</string>
+    <string name="bssid_et_hint">00:11:22:33:44:55</string>
 </resources>
