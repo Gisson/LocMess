@@ -1,7 +1,7 @@
 #Remove DS_Store items form git
 
-
-**/.DS_STORE
+.DS_Store
+**/.DS_Store
 
 
 
