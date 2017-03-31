@@ -54,7 +54,21 @@ class ListLocationsHandler(tornado.web.RequestHandler):
                 self.write(l.getName()+"\n")
         except LoginError:
             self.write("Nope")
-        #global locations
+
+class RemoveLocationHandler(tornado.web.RequestHandler):
+    def get(self):
+        try:
+            getUserFromToken(self.get_argument("token"))
+            global locations
+            locationName=getUserFromToken(self.get_argument("location"))
+            for i in range(len(locations)):
+                if locations[i].name==locationName:
+                    if i==len(locations)-1:
+                        locations.pop()
+                    else:
+                        locations=locations[0:i-1]+locations[i+1:len(locations)]
+        except LoginError:
+            self.write("Nope")
 
 class AddLocationHandler(tornado.web.RequestHandler):
     def get(self):
@@ -89,7 +103,19 @@ class PostMessageHandler(tornado.web.RequestHandler):
                     l.postMessage(author,self.get_argument("message"))
         except LoginError:
             self.write("Nope")
-        #global locations
+
+class UnpostMessageHandler(tornado.web.RequestHandler):
+    def get(self):
+        try:
+            author=getUserFromToken(self.get_argument("token"))
+            global locations
+            for l in locations:
+                if self.get_argument("location")==l.getName():
+                    l.unpostMessage(author.getUsername()+"-"+l.getName()+"-"\
+                    +self.get_argument("messageId"))
+        except LoginError:
+            self.write("Nope")
+
 
 
 class ListMessagesHandler(tornado.web.RequestHandler):
@@ -101,7 +127,37 @@ class ListMessagesHandler(tornado.web.RequestHandler):
                 self.write(l.__str__())
         except LoginError:
             self.write("Nope")
-        #global locations
+
+class readMessageHandler(tornado.web.RequestHandler):
+    def get(self):
+        try:
+            user=getUserFromToken(self.get_argument("token"))
+            global locations
+            for l in locations:
+                if self.get_argument("location")==l.getName():
+                    self.write(str(l.getMessage(user.getUsername()+"-"+\
+                    l.getName()+"-"+self.get_argument("messageId"))))
+            # The server must explicitly say which\
+            #message is required
+        except LoginError:
+            self.write("Nope")
+
+class AddKeyHandler(tornado.web.RequestHandler):
+    def get(self):
+        try:
+            user=getUserFromToken(self.get_argument("token"))
+            user.addKey(self.get_argument("key"),self.get_argument("value"))
+        except LoginError:
+            self.write("Nope")
+
+class ListKeysHandler(tornado.web.RequestHandler):
+    def get(self):
+        try:
+            user=getUserFromToken(self.get_argument("token"))
+            for key,value in user.getKeys():
+                self.write("key: "+key+" value: "+value+"\n")
+        except LoginError:
+            self.write("Nope")
 
 def parseIDs(ids):
     return ids.split(",")
@@ -120,13 +176,13 @@ def make_app():
     (r"/logoutUser", LogoutHandler),
     (r"/listLocations", ListLocationsHandler),
     (r"/addLocation", AddLocationHandler),
-#TODO    (r"/removeLocation", RemoveLocationHandler),
+    (r"/removeLocation", RemoveLocationHandler),
     (r"/postMessage", PostMessageHandler),
-#TODO    (r"/unpostMessage", UnpostMessageHandler),
-#TODO    (r"/readMessage", ListKeysHandler),
+    (r"/unpostMessage", UnpostMessageHandler),
+    (r"/readMessage", readMessageHandler),
     (r"/listMessages", ListMessagesHandler),
-#TODO    (r"/addKey", AddKeyHandler),
-#TODO    (r"/listKeys", ListKeysHandler),
+    (r"/addKey", AddKeyHandler),
+    (r"/listKeys", ListKeysHandler),
     ])
 
 if __name__=="__main__":
@@ -134,7 +190,9 @@ if __name__=="__main__":
     logging.basicConfig(level=logging.DEBUG)
     logging.debug("Starting server...")
     global users
-    users=[user("bla","bla")]
+    newuser=user("bla","bla")
+    users=[newuser,]
+    logging.debug(str(newuser.add_token()))
     global locations
     locations=[location("RNL")]
     if len(sys.argv)>1 :

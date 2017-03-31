@@ -12,7 +12,7 @@ class user:
         m.update(password.encode('utf-8'))
         self.passhash=base64.b64encode(m.digest())
         self.username=username
-        self.keys={}
+        self.keys={"bla":"blabla"}
 
     def add_token(self):
         uid=uuid.uuid4()
@@ -40,8 +40,11 @@ class user:
         else:
             return False
     def addKey(self,key,value):
-        if key in self.keys:
+        if key not in self.keys:
             self.keys[key]=value
 
     def getKeys(self):
-            return self.keys
+        return self.keys
+
+    def __str__(self):
+        return "Username: "+self.username

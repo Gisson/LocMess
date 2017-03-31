@@ -1,4 +1,4 @@
-
+from message import message
 
 class location:
 
@@ -9,7 +9,11 @@ class location:
         self.latitude=latitude
         self.longitude=longitude
         self.radius=radius
-        self.messages=[]
+        self.messages={}
+        self.messageIds=0
+
+    def getName(self):
+        return self.name
 
     def getBssids(self):
         if not self.bssids:
@@ -32,18 +36,26 @@ class location:
             raise ValueError
         else:
             return self.messages
-
-    def postMessage(self,author,message):
-        self.messages+=[(author,message),]
-
     #TODO
-    def unpostMessage(self):
-        raise ValueError
+    def unpostMessage(self,fullId):
+        del self.messages[fullId]
     def getName(self):
         return self.name
 
-    def getMessages(self):
-        finalValue=self.getName()
-        for m in messages:
-            m+="author: "+m[0]+" mesage: "+m[1]+"\n"
-        return finalValue
+    def postMessage(self,author,content):
+        mId=author.getUsername()+"-"+self.name+"-"+str(self.messageIds)
+        self.messages[mId]=message(author,self,content)
+        self.messageIds+=1
+        return mId
+
+    def getMessage(self,messageId):
+        return self.messages[messageId]
+
+    def __cmp__(self,location):
+        return True if self.name==location.name else False
+
+    def __str__(self):
+        rep="Location name: "+self.name+"\n"
+        for key,message in self.messages.items():
+            rep+="Message: "+str(message)+" with id="+key+"\n"
+        return rep
