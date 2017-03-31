@@ -37,19 +37,27 @@ class location:
         else:
             return self.messages
     #TODO
-    def unpostMessage(self,fullId):
-        del self.messages[fullId]
+    def unpostMessage(self,author,fullId):
+        if author.getUsername() == self.messages[fullId].get_author():
+            del self.messages[fullId]
+        else:
+            raise LoginError
     def getName(self):
         return self.name
 
     def postMessage(self,author,content):
-        mId=author.getUsername()+"-"+self.name+"-"+str(self.messageIds)
-        self.messages[mId]=message(author,self,content)
+        mId=self.messageIds
+        self.messages[mId]=message(author,self,content,mId)
         self.messageIds+=1
         return mId
 
     def getMessage(self,messageId):
-        return self.messages[messageId]
+        return self.messages[int(messageId)]
+
+    def getJson(self):
+        finalJson={'name':self.name, 'bssids':self.bssids,\
+        'ssids':self.ssids,'latitude':self.latitude,'longitude':self.longitude,'radius':self.radius}
+        return finalJson
 
     def __cmp__(self,location):
         return True if self.name==location.name else False

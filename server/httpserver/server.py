@@ -7,6 +7,7 @@ from user import user
 from location import location
 import logging
 from LoginError import *
+import simplejson, json
 
 PORT=31000
 
@@ -16,6 +17,8 @@ class RegisterHandler(tornado.web.RequestHandler):
         global users
         newuser=user(self.get_argument("username"),self.get_argument("password"))
         users+=[newuser,]
+        self.write(json.dumps({'type': 'register','response': 'success'}\
+        ,indent=4,separators=(',', ': ')))
         logging.debug("New user username="+newuser.getUsername()\
         +" and password="+str(newuser.getPassword()))
 
@@ -29,17 +32,19 @@ class LoginHandler(tornado.web.RequestHandler):
             +" vs "+self.get_argument("password"))
             if(u.getUsername()==self.get_argument("username") and \
             u.isPasswordCorrect(self.get_argument("password"))):
-                self.write(str(u.add_token()))
-                break
-            else:
-                self.write("Nope")
+                self.write(json.dumps({'type': 'login','response': 'success','token': str(u.add_token())}\
+                ,indent=4,separators=(',', ': ')))
+                #self.write(str(u.add_token()))
+                return;
+        self.write("Nope")
 
 class LogoutHandler(tornado.web.RequestHandler):
     def get(self):
         for u in users:
             if(u.isValidToken(self.get_argument("token"))):
                 u.remove_token()
-                self.write("Successful logout")
+                self.write(json.dumps({'type': 'logout','response': 'success'}\
+                ,indent=4,separators=(',', ': ')))
                 break
             else:
                 self.write("Nope")
@@ -50,8 +55,13 @@ class ListLocationsHandler(tornado.web.RequestHandler):
         try:
             getUserFromToken(self.get_argument("token"))
             global locations
+            finalJson={'type':'listLocations','response':'success'}
+            locationsDict={}
             for l in locations:
-                self.write(l.getName()+"\n")
+                locationsDict[l.getName()]=l.getJson()
+                #self.write(l.getName()+"\n")
+            finalJson['locations']=locationsDict
+            self.write(json.dumps(finalJson ,indent=4,separators=(',', ': ')))
         except LoginError:
             self.write("Nope")
 
@@ -67,6 +77,9 @@ class RemoveLocationHandler(tornado.web.RequestHandler):
                         locations.pop()
                     else:
                         locations=locations[0:i-1]+locations[i+1:len(locations)]
+                    break
+            self.write(json.dumps({'type': 'removeLocation','response': 'success'}\
+            ,indent=4,separators=(',', ': ')))
         except LoginError:
             self.write("Nope")
 
@@ -90,6 +103,7 @@ class AddLocationHandler(tornado.web.RequestHandler):
                     ssids=self.get_argument("ssid")
                     locations+=[location(name=name,ssids=ssids),]
 
+
         except LoginError:
             self.write("Nope")
 
@@ -101,6 +115,9 @@ class PostMessageHandler(tornado.web.RequestHandler):
             for l in locations:
                 if self.get_argument("location")==l.getName():
                     l.postMessage(author,self.get_argument("message"))
+                    self.write(json.dumps({'type': 'postMessage','response': 'success'}\
+                    ,indent=4,separators=(',', ': ')))
+                    break
         except LoginError:
             self.write("Nope")
 
@@ -111,8 +128,10 @@ class UnpostMessageHandler(tornado.web.RequestHandler):
             global locations
             for l in locations:
                 if self.get_argument("location")==l.getName():
-                    l.unpostMessage(author.getUsername()+"-"+l.getName()+"-"\
-                    +self.get_argument("messageId"))
+                    l.unpostMessage(author,self.get_argument("messageId"))
+                    self.write(json.dumps({'type': 'unpostMessage','response': 'success'}\
+                    ,indent=4,separators=(',', ': ')))
+                    break
         except LoginError:
             self.write("Nope")
 
@@ -123,11 +142,20 @@ class ListMessagesHandler(tornado.web.RequestHandler):
         try:
             getUserFromToken(self.get_argument("token"))
             global locations
+            finalJson={'type':'listMessages','response':'success'}
+            locationName=self.get_argument("location")
             for l in locations:
-                self.write(l.__str__())
+                if l.getName()==locationName:
+                    messages={}
+                    for m in l.getMessages().values():
+                        messages[m.get_id()]=m.getJson()
+                    finalJson['messages']=messages
+                    break
+            self.write(json.dumps(finalJson ,indent=4,separators=(',', ': ')))
         except LoginError:
             self.write("Nope")
 
+##################################################
 class readMessageHandler(tornado.web.RequestHandler):
     def get(self):
         try:
@@ -135,8 +163,9 @@ class readMessageHandler(tornado.web.RequestHandler):
             global locations
             for l in locations:
                 if self.get_argument("location")==l.getName():
-                    self.write(str(l.getMessage(user.getUsername()+"-"+\
-                    l.getName()+"-"+self.get_argument("messageId"))))
+                    self.write(json.dumps({'type': 'readMessage','response': 'success',\
+                    'message':l.getMessage(self.get_argument("messageId")).getJson()}\
+                    ,indent=4,separators=(',', ': ')))
             # The server must explicitly say which\
             #message is required
         except LoginError:
@@ -154,8 +183,12 @@ class ListKeysHandler(tornado.web.RequestHandler):
     def get(self):
         try:
             user=getUserFromToken(self.get_argument("token"))
+            finalJson={'type': 'listKeys','response': 'success'}
+            keys=[]
             for key,value in user.getKeys():
-                self.write("key: "+key+" value: "+value+"\n")
+                keys+=[{'key':key,'value':value},]
+            finalJson['keys']=keys
+            self.write(json.dumps(finalJson,indent=4,separators=(',', ': ')))
         except LoginError:
             self.write("Nope")
 
@@ -192,7 +225,7 @@ if __name__=="__main__":
     global users
     newuser=user("bla","bla")
     users=[newuser,]
-    logging.debug(str(newuser.add_token()))
+    #logging.debug(str(newuser.add_token()))
     global locations
     locations=[location("RNL")]
     if len(sys.argv)>1 :
