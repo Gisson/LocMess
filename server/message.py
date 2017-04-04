@@ -25,4 +25,4 @@ class message:
         return {'author':self.author.getUsername(),'location':self.location.getName(),'content':self.content}
 
     def __str__(self):
-        return "Author: "+str(self.author)+" Content: "+self.content+" Id="+self.id
+        return " Id: "+str(self.id)+"Author: "+author.getusername()+" Content: "+self.content

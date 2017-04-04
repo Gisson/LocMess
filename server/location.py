@@ -1,4 +1,6 @@
 from message import message
+from NoMessagesError import NoMessagesError
+from LoginError import LoginError
 
 class location:
 
@@ -33,13 +35,14 @@ class location:
             return (self.latitude,self.longitude,self.radius)
     def getMessages(self):
         if not self.messages:
-            raise ValueError
+            raise NoMessagesError
         else:
             return self.messages
     #TODO
     def unpostMessage(self,author,fullId):
-        if author.getUsername() == self.messages[fullId].get_author():
-            del self.messages[fullId]
+        if author.getUsername() == self.messages[int(fullId)].get_author().getUsername()\
+            and int(fullId)<len(self.messages):
+            del self.messages[int(fullId)]
         else:
             raise LoginError
     def getName(self):
@@ -55,7 +58,7 @@ class location:
         return self.messages[int(messageId)]
 
     def getJson(self):
-        finalJson={'name':self.name, 'bssids':self.bssids,\
+        finalJson={'bssids':self.bssids,\
         'ssids':self.ssids,'latitude':self.latitude,'longitude':self.longitude,'radius':self.radius}
         return finalJson
 
