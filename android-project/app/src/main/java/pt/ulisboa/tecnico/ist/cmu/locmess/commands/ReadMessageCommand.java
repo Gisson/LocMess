@@ -8,6 +8,7 @@ import java.util.HashMap;
 
 import pt.ulisboa.tecnico.ist.cmu.locmess.JsonParser;
 import pt.ulisboa.tecnico.ist.cmu.locmess.exception.AlreadyRequestedException;
+import pt.ulisboa.tecnico.ist.cmu.locmess.exception.NotYetRequestedException;
 
 /**
  * Created by jorge on 03/04/17.
@@ -28,7 +29,7 @@ public class ReadMessageCommand extends AbstractCommand {
         super.execute();
     }
 
-    public HashMap<String,String> getResult() throws IOException, AlreadyRequestedException, JSONException {
+    public HashMap<String,String> getResult() throws IOException, AlreadyRequestedException, JSONException, NotYetRequestedException {
         if(_results==null){
             _results=new HashMap<String,String>();
             _results.put("Id", JsonParser.getValue(super.getResponse(),"Id"));

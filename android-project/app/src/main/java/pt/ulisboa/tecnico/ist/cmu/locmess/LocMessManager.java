@@ -5,6 +5,7 @@ import android.os.AsyncTask;
 import java.io.IOException;
 
 import pt.ulisboa.tecnico.ist.cmu.locmess.commands.AbstractCommand;
+import pt.ulisboa.tecnico.ist.cmu.locmess.commands.LoginUserCommand;
 import pt.ulisboa.tecnico.ist.cmu.locmess.exception.AlreadyRequestedException;
 
 /**
@@ -14,17 +15,28 @@ import pt.ulisboa.tecnico.ist.cmu.locmess.exception.AlreadyRequestedException;
 public class LocMessManager {
 
     private static LocMessManager _manager=null;
+    private String _currentToken;
+
 
     protected LocMessManager(){
 
     }
-    public LocMessManager getInstance(){
+    public static LocMessManager getInstance(){
         if(_manager==null){
             _manager=new LocMessManager();
         }
         return _manager;
     }
 
+    public void executeAsync(LoginUserCommand loginCommand) throws IOException, AlreadyRequestedException {
+        NetworkingCommand nc = new NetworkingCommand();
+        nc.execute(loginCommand);
+
+    }
+
+    public void executeAsync(AbstractCommand abstractCommand){
+        (new NetworkingCommand()).execute(abstractCommand);
+    }
 
     public class NetworkingCommand extends AsyncTask<AbstractCommand,Void,Boolean>{
 
@@ -50,5 +62,12 @@ public class LocMessManager {
             System.out.println("RESULT IS: "+result);
             _completed = result;
         }
+    }
+
+    public void setToken(String token){
+        _currentToken=token;
+    }
+    public String getToken(){
+        return _currentToken;
     }
 }

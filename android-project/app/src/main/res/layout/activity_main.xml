@@ -23,7 +23,7 @@
         android:layout_marginTop="94dp"
         android:ems="10"
         android:inputType="textPersonName"
-        android:text="Donald" />
+        android:text="bla" />
 
     <EditText
         android:id="@+id/password_input"
@@ -35,7 +35,7 @@
         android:layout_marginTop="26dp"
         android:ems="10"
         android:inputType="textPassword"
-        android:text="America" />
+        android:text="bla" />
 
     <TextView
         android:text="Username: "

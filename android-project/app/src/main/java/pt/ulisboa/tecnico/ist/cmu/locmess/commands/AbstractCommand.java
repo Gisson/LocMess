@@ -34,7 +34,7 @@ public abstract class AbstractCommand {
         if(_requestState){
             throw new AlreadyRequestedException();
         }
-        URL url=new URL(SERVERADDR+":"+SERVERPORT.toString()+"/"+_endpoint+"?"+_args);
+        URL url=new URL("http://"+SERVERADDR+":"+SERVERPORT.toString()+"/"+_endpoint+"?"+_args);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");
         BufferedReader in = new BufferedReader(
@@ -50,9 +50,9 @@ public abstract class AbstractCommand {
         _requestState=true;
     }
 
-    public String getResponse() throws IOException, AlreadyRequestedException {
+    public String getResponse() throws NotYetRequestedException {
         if(!_requestState){
-            execute();
+            throw new NotYetRequestedException();
         }
         return _response;
 

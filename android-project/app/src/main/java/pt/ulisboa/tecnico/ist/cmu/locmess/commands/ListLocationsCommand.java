@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import pt.ulisboa.tecnico.ist.cmu.locmess.exception.AlreadyRequestedException;
+import pt.ulisboa.tecnico.ist.cmu.locmess.exception.NotYetRequestedException;
 
 /**
  * Created by jorge on 03/04/17.
@@ -30,7 +31,7 @@ public class ListLocationsCommand extends AbstractCommand {
     }
 
     //DONT GET SCARED!!! READ THE COMMENTS
-    public Map<String,HashMap<String,String>> getResults() throws IOException, AlreadyRequestedException, JSONException {
+    public Map<String,HashMap<String,String>> getResults() throws IOException, AlreadyRequestedException, JSONException, NotYetRequestedException {
         if(_results==null){
             JSONObject obj=new JSONObject(getResponse());
             JSONArray arr=obj.getJSONArray("locations");
