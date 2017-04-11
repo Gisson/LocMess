@@ -101,4 +101,9 @@ public class LocationsMenuActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
+    public void addLocation(View v){
+        Intent i = new Intent(this, AddLocationActivity.class);
+        startActivity(i);
+    }
 }
