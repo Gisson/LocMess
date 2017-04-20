@@ -13,4 +13,14 @@
     tools:context="pt.ulisboa.tecnico.ist.cmu.locmess.LocationsMenuActivity"
     tools:showIn="@layout/app_bar_locations_menu">
 
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/locations_list"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginRight="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="13dp" />
 </RelativeLayout>

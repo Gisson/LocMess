@@ -12,7 +12,7 @@ import android.widget.RadioButton;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import pt.ulisboa.tecnico.ist.cmu.locmess.topics.TopicsListAdapter;
+import pt.ulisboa.tecnico.ist.cmu.locmess.adapters.TopicsListAdapter;
 
 public class EditPolicyActivity extends AppCompatActivity {
     private static final String TAG = "EditPolicyActivity";

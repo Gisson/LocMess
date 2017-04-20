@@ -1,4 +1,4 @@
-package pt.ulisboa.tecnico.ist.cmu.locmess.topics;
+package pt.ulisboa.tecnico.ist.cmu.locmess.adapters;
 
 import android.app.Activity;
 import android.app.AlertDialog;

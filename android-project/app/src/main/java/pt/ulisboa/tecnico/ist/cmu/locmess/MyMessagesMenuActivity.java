@@ -12,11 +12,17 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+
 public class MyMessagesMenuActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener{
+
+    private ArrayList<String> messages;
+    private BaseAdapter messagesAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

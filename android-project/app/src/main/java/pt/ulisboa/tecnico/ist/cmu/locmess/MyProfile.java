@@ -11,7 +11,7 @@ import android.widget.ListView;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import pt.ulisboa.tecnico.ist.cmu.locmess.topics.TopicsListAdapter;
+import pt.ulisboa.tecnico.ist.cmu.locmess.adapters.TopicsListAdapter;
 
 public class MyProfile extends AppCompatActivity {
     private static final String TAG = "MyProfileActivity";
