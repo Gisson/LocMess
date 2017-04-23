@@ -10,6 +10,7 @@ android:
     - platform-tools
     - tools
     - build-tools-25.0.0
+    - tools
     - extra-android-support
 #    - extra-google-google_play_services
     - android-16
