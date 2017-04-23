@@ -1,14 +1,13 @@
 package pt.ulisboa.tecnico.ist.cmu.locmess.commands;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.HashMap;
 
 import pt.ulisboa.tecnico.ist.cmu.locmess.JsonParser;
-import pt.ulisboa.tecnico.ist.cmu.locmess.exception.AlreadyRequestedException;
-import pt.ulisboa.tecnico.ist.cmu.locmess.exception.NotYetRequestedException;
+import pt.ulisboa.tecnico.ist.cmu.locmess.exception.DuplicateExecutionException;
+import pt.ulisboa.tecnico.ist.cmu.locmess.exception.CommandNotExecutedException;
 
 /**
  * Created by jorge on 03/04/17.
@@ -25,11 +24,11 @@ public class ReadMessageCommand extends AbstractCommand {
     }
 
     @Override
-    public void execute() throws IOException, AlreadyRequestedException {
+    public void execute() throws IOException, DuplicateExecutionException {
         super.execute();
     }
 
-    public HashMap<String,String> getResult() throws IOException, AlreadyRequestedException, JSONException, NotYetRequestedException {
+    public HashMap<String,String> getResult() throws IOException, DuplicateExecutionException, JSONException, CommandNotExecutedException {
         if(_results==null){
             _results=new HashMap<String,String>();
             _results.put("Id", JsonParser.getValue(super.getResponse(),"Id"));

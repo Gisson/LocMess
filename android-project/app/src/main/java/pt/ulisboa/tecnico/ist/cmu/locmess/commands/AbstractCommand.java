@@ -6,8 +6,8 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import pt.ulisboa.tecnico.ist.cmu.locmess.exception.AlreadyRequestedException;
-import pt.ulisboa.tecnico.ist.cmu.locmess.exception.NotYetRequestedException;
+import pt.ulisboa.tecnico.ist.cmu.locmess.exception.DuplicateExecutionException;
+import pt.ulisboa.tecnico.ist.cmu.locmess.exception.CommandNotExecutedException;
 
 /**
  * Created by jorge on 03/04/17.
@@ -18,7 +18,7 @@ public abstract class AbstractCommand {
     private final String SERVERADDR="pikachu.rnl.tecnico.ulisboa.pt";
     private final Integer SERVERPORT=31000;
     private String _endpoint,_args,_response;
-    protected boolean _requestState=false;
+    protected boolean _executed=false;
 
     protected AbstractCommand(String endpoint, String args){
         _endpoint=endpoint;
@@ -30,9 +30,9 @@ public abstract class AbstractCommand {
         _args="";
     }
 
-    public void execute() throws IOException, AlreadyRequestedException {
-        if(_requestState){
-            throw new AlreadyRequestedException();
+    public void execute() throws IOException, DuplicateExecutionException {
+        if(_executed){
+            throw new DuplicateExecutionException();
         }
         URL url=new URL("http://"+SERVERADDR+":"+SERVERPORT.toString()+"/"+_endpoint+"?"+_args);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -47,12 +47,12 @@ public abstract class AbstractCommand {
         }
         in.close();
         _response=response;
-        _requestState=true;
+        _executed =true;
     }
 
-    public String getResponse() throws NotYetRequestedException {
-        if(!_requestState){
-            throw new NotYetRequestedException();
+    public String getResponse() throws CommandNotExecutedException {
+        if(!_executed){
+            throw new CommandNotExecutedException();
         }
         return _response;
 

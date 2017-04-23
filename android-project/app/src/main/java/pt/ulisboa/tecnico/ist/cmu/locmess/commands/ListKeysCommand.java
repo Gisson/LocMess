@@ -8,8 +8,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import pt.ulisboa.tecnico.ist.cmu.locmess.exception.AlreadyRequestedException;
-import pt.ulisboa.tecnico.ist.cmu.locmess.exception.NotYetRequestedException;
+import pt.ulisboa.tecnico.ist.cmu.locmess.exception.DuplicateExecutionException;
+import pt.ulisboa.tecnico.ist.cmu.locmess.exception.CommandNotExecutedException;
 
 /**
  * Created by jorge on 03/04/17.
@@ -26,11 +26,11 @@ public class ListKeysCommand extends AbstractCommand {
     }
 
     @Override
-    public void execute() throws IOException, AlreadyRequestedException {
+    public void execute() throws IOException, DuplicateExecutionException {
         super.execute();
     }
 
-    public Map<String,String> getResults() throws IOException, AlreadyRequestedException, JSONException, NotYetRequestedException {
+    public Map<String,String> getResults() throws IOException, DuplicateExecutionException, JSONException, CommandNotExecutedException {
         if(_results==null){
             JSONObject obj=new JSONObject(getResponse());
             JSONArray arr=obj.getJSONArray("keys");
