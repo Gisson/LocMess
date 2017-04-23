@@ -6,9 +6,10 @@ android:
   components:
 #    - extra-google-m2repository
 #    - extra-android-m2repository
-    - build-tools-25.0.0
+    - tools
     - platform-tools
     - tools
+    - build-tools-25.0.0
     - extra-android-support
 #    - extra-google-google_play_services
     - android-16
