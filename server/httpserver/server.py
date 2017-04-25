@@ -7,6 +7,7 @@ from user import user
 from location import location
 import logging
 from LoginError import *
+from NoMessagesError import *
 import simplejson, json
 
 PORT=31000
@@ -15,6 +16,11 @@ PORT=31000
 class RegisterHandler(tornado.web.RequestHandler):
     def get(self):
         global users
+        for u in users:
+            if u.username == self.get_argument("username"):
+                self.write(json.dumps({'type': 'register','response': 'failure','reason':'user_exists'}\
+                ,indent=4,separators=(',', ': ')))
+                return ;
         newuser=user(self.get_argument("username"),self.get_argument("password"))
         users+=[newuser,]
         self.write(json.dumps({'type': 'register','response': 'success'}\
@@ -36,7 +42,7 @@ class LoginHandler(tornado.web.RequestHandler):
                 ,indent=4,separators=(',', ': ')))
                 #self.write(str(u.add_token()))
                 return;
-        self.write(json.dumps({'type': 'loginUser','response': 'failure'}\
+        self.write(json.dumps({'type': 'loginUser','response': 'failure','reason':'icorrect_username_password'}\
              ,indent=4,separators=(',', ': ')))
 
 class LogoutHandler(tornado.web.RequestHandler):
@@ -65,6 +71,9 @@ class ListLocationsHandler(tornado.web.RequestHandler):
             finalJson['locations']=locationsList
             self.write(json.dumps(finalJson ,indent=4,separators=(',', ': ')))
         except LoginError:
+            self.write(json.dumps({'type': 'listLocations','response': 'failure','reason':'invalid_token'}\
+             ,indent=4,separators=(',', ': ')))
+        except :
             self.write(json.dumps({'type': 'listLocations','response': 'failure'}\
              ,indent=4,separators=(',', ': ')))
 
@@ -81,18 +90,29 @@ class RemoveLocationHandler(tornado.web.RequestHandler):
                     else:
                         locations=locations[0:i-1]+locations[i+1:len(locations)]
                     break
+                elif i==len(locations)-1:
+                    self.write(json.dumps({'type': 'removeLocation','response': 'failure','reason':'no_such_location'}\
+                    ,indent=4,separators=(',', ': ')))
+                    return;
             self.write(json.dumps({'type': 'removeLocation','response': 'success'}\
             ,indent=4,separators=(',', ': ')))
         except LoginError:
+            self.write(json.dumps({'type': 'removeLocation','response': 'failure','reason':'invalid_token'}\
+             ,indent=4,separators=(',', ': ')))
+        except: 
             self.write(json.dumps({'type': 'removeLocation','response': 'failure'}\
              ,indent=4,separators=(',', ': ')))
-
 class AddLocationHandler(tornado.web.RequestHandler):
     def get(self):
         try:
             getUserFromToken(self.get_argument("token"))
             global locations
             name=self.get_argument("name")
+            for l in locations:
+                if l.name==name:
+                    self.write(json.dumps({'type': 'addLocation','response': 'failure','reason':'location_exists'}\
+                     ,indent=4,separators=(',', ': '))) 
+                    return;
             try:
                 lat=self.get_argument("latitude")
                 log=self.get_argument("longitude")
@@ -109,6 +129,9 @@ class AddLocationHandler(tornado.web.RequestHandler):
 
 
         except LoginError:
+            self.write(json.dumps({'type': 'addLocation','response': 'failure','reason':'invalid_token'}\
+             ,indent=4,separators=(',', ': ')))
+        except :
             self.write(json.dumps({'type': 'addLocation','response': 'failure'}\
              ,indent=4,separators=(',', ': ')))
 
@@ -124,7 +147,10 @@ class PostMessageHandler(tornado.web.RequestHandler):
                     ,indent=4,separators=(',', ': ')))
                     break
         except LoginError:
-            self.write(json.dumps({'type': 'postMessage','response': 'failure'}\
+            self.write(json.dumps({'type': 'postMessage','response': 'failure','reason':'invalid_token'}\
+             ,indent=4,separators=(',', ': ')))
+        except :
+            self.write(json.dumps({'type': 'postMessage','response': 'failure','reason':'invalid_token'}\
              ,indent=4,separators=(',', ': ')))
 
 class UnpostMessageHandler(tornado.web.RequestHandler):
@@ -137,8 +163,13 @@ class UnpostMessageHandler(tornado.web.RequestHandler):
                     l.unpostMessage(author,self.get_argument("messageId"))
                     self.write(json.dumps({'type': 'unpostMessage','response': 'success'}\
                     ,indent=4,separators=(',', ': ')))
-                    break
+                    return;
+            self.write(json.dumps({'type': 'unpostMessage','response': 'failure','reason':'no_such_location'}\
+             ,indent=4,separators=(',', ': ')))       
         except LoginError:
+            self.write(json.dumps({'type': 'unpostMessage','response': 'failure','reason':'invalid_token'}\
+             ,indent=4,separators=(',', ': ')))
+        except :
             self.write(json.dumps({'type': 'unpostMessage','response': 'failure'}\
              ,indent=4,separators=(',', ': ')))
 
@@ -159,6 +190,12 @@ class ListMessagesHandler(tornado.web.RequestHandler):
                     finalJson['messages']=messages
                     break
             self.write(json.dumps(finalJson ,indent=4,separators=(',', ': ')))
+        except LoginError:
+            self.write(json.dumps({'type': 'listMessages','response': 'failure','reason':'incorrect_token'}\
+             ,indent=4,separators=(',', ': ')))
+        except NoMessagesError:
+            self.write(json.dumps({'type': 'listMessages','response': 'failure','reason':'no_messages_found'}\
+             ,indent=4,separators=(',', ': ')))
         except :
             self.write(json.dumps({'type': 'listMessages','response': 'failure'}\
              ,indent=4,separators=(',', ': ')))
@@ -175,9 +212,18 @@ class readMessageHandler(tornado.web.RequestHandler):
                     self.write(json.dumps({'type': 'readMessage','response': 'success',\
                     'message':l.getMessage(self.get_argument("messageId")).getJson()}\
                     ,indent=4,separators=(',', ': ')))
+                    return;
             # The server must explicitly say which\
             #message is required
+            self.write(json.dumps({'type': 'readMessage','response': 'failure','reason':'no_such_location'}\
+             ,indent=4,separators=(',', ': ')))   
+        except KeyError:
+            self.write(json.dumps({'type': 'readMessage','response': 'failure','reason':'no_such_message'}\
+             ,indent=4,separators=(',', ': ')))
         except LoginError:
+            self.write(json.dumps({'type': 'readMessage','response': 'failure','reason':'incorrect_token'}\
+             ,indent=4,separators=(',', ': ')))
+        except :
             self.write(json.dumps({'type': 'readMessage','response': 'failure'}\
              ,indent=4,separators=(',', ': ')))
 
@@ -189,6 +235,9 @@ class AddKeyHandler(tornado.web.RequestHandler):
             self.write(json.dumps({'type': 'addKey','response': 'success'}\
              ,indent=4,separators=(',', ': ')))
         except LoginError:
+            self.write(json.dumps({'type': 'addKey','response': 'failure','reason':'incorrect_token'}\
+             ,indent=4,separators=(',', ': ')))
+        except :
             self.write(json.dumps({'type': 'addKey','response': 'failure'}\
              ,indent=4,separators=(',', ': ')))
 
@@ -203,6 +252,9 @@ class ListKeysHandler(tornado.web.RequestHandler):
             finalJson['keys']=keys
             self.write(json.dumps(finalJson,indent=4,separators=(',', ': ')))
         except LoginError:
+            self.write(json.dumps({'type': 'listKeys','response': 'failure','reason':'incorrect_token'}\
+             ,indent=4,separators=(',', ': ')))
+        except :
             self.write(json.dumps({'type': 'listKeys','response': 'failure'}\
              ,indent=4,separators=(',', ': ')))
 
