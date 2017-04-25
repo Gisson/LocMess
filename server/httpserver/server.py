@@ -150,7 +150,7 @@ class PostMessageHandler(tornado.web.RequestHandler):
             self.write(json.dumps({'type': 'postMessage','response': 'failure','reason':'invalid_token'}\
              ,indent=4,separators=(',', ': ')))
         except :
-            self.write(json.dumps({'type': 'postMessage','response': 'failure','reason':'invalid_token'}\
+            self.write(json.dumps({'type': 'postMessage','response': 'failure'}\
              ,indent=4,separators=(',', ': ')))
 
 class UnpostMessageHandler(tornado.web.RequestHandler):
