@@ -6,7 +6,7 @@ import java.io.IOException;
 
 import pt.ulisboa.tecnico.ist.cmu.locmess.commands.AbstractCommand;
 import pt.ulisboa.tecnico.ist.cmu.locmess.commands.LoginUserCommand;
-import pt.ulisboa.tecnico.ist.cmu.locmess.exception.AlreadyRequestedException;
+import pt.ulisboa.tecnico.ist.cmu.locmess.exception.DuplicateExecutionException;
 
 /**
  * Created by jorge on 03/04/17.
@@ -28,7 +28,7 @@ public class LocMessManager {
         return _manager;
     }
 
-    public void executeAsync(LoginUserCommand loginCommand) throws IOException, AlreadyRequestedException {
+    public void executeAsync(LoginUserCommand loginCommand) throws IOException, DuplicateExecutionException {
         NetworkingCommand nc = new NetworkingCommand();
         nc.execute(loginCommand);
 
@@ -49,7 +49,7 @@ public class LocMessManager {
                     c.execute();
                 } catch (IOException e) {
                     e.printStackTrace();
-                } catch (AlreadyRequestedException e) {
+                } catch (DuplicateExecutionException e) {
                     //FIXME: Handle this exception correctly
                     e.printStackTrace();
                 }

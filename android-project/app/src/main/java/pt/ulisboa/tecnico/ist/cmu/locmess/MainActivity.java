@@ -9,7 +9,6 @@ import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.Window;
-import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -17,9 +16,9 @@ import java.io.IOException;
 
 import pt.ulisboa.tecnico.ist.cmu.locmess.commands.AbstractCommand;
 import pt.ulisboa.tecnico.ist.cmu.locmess.commands.LoginUserCommand;
-import pt.ulisboa.tecnico.ist.cmu.locmess.exception.AlreadyRequestedException;
+import pt.ulisboa.tecnico.ist.cmu.locmess.exception.DuplicateExecutionException;
 import pt.ulisboa.tecnico.ist.cmu.locmess.exception.LoginFailedException;
-import pt.ulisboa.tecnico.ist.cmu.locmess.exception.NotYetRequestedException;
+import pt.ulisboa.tecnico.ist.cmu.locmess.exception.CommandNotExecutedException;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -33,8 +32,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        /*getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);*/
         setContentView(R.layout.activity_main);
     }
 
@@ -70,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
             startActivity(i);
         }catch(LoginFailedException e){
             Toast.makeText(getApplicationContext(),"Login failed", Toast.LENGTH_SHORT).show();
-        } catch (NotYetRequestedException  e) {
+        } catch (CommandNotExecutedException e) {
             e.printStackTrace();
         }
     }
@@ -84,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
                     c.execute();
                 } catch (IOException e) {
                     e.printStackTrace();
-                } catch (AlreadyRequestedException e) {
+                } catch (DuplicateExecutionException e) {
                     //FIXME: Handle this exception correctly
                     e.printStackTrace();
                 }

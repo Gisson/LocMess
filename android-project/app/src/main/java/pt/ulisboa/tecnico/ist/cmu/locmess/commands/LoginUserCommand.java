@@ -5,9 +5,9 @@ import org.json.JSONException;
 import java.io.IOException;
 
 import pt.ulisboa.tecnico.ist.cmu.locmess.JsonParser;
-import pt.ulisboa.tecnico.ist.cmu.locmess.exception.AlreadyRequestedException;
+import pt.ulisboa.tecnico.ist.cmu.locmess.exception.DuplicateExecutionException;
 import pt.ulisboa.tecnico.ist.cmu.locmess.exception.LoginFailedException;
-import pt.ulisboa.tecnico.ist.cmu.locmess.exception.NotYetRequestedException;
+import pt.ulisboa.tecnico.ist.cmu.locmess.exception.CommandNotExecutedException;
 
 /**
  * Created by jorge on 03/04/17.
@@ -25,21 +25,21 @@ public class LoginUserCommand extends AbstractCommand {
     }
 
     @Override
-    public void execute() throws IOException, AlreadyRequestedException {
+    public void execute() throws IOException, DuplicateExecutionException {
         super.execute();
         try {
             _token=JsonParser.getValue(super.getResponse(),"token");
             _success=true;
         } catch (JSONException e) {
             _success=false;
-        } catch (NotYetRequestedException e) {
+        } catch (CommandNotExecutedException e) {
             e.printStackTrace();
         }
     }
 
-    public String getToken() throws NotYetRequestedException, LoginFailedException {
-        if(!_requestState){
-           throw new NotYetRequestedException();
+    public String getToken() throws CommandNotExecutedException, LoginFailedException {
+        if(!_executed){
+           throw new CommandNotExecutedException();
         }
         if( _success) {
             return _token;

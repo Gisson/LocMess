@@ -15,10 +15,9 @@ import org.json.JSONException;
 import java.io.IOException;
 
 import pt.ulisboa.tecnico.ist.cmu.locmess.commands.AbstractCommand;
-import pt.ulisboa.tecnico.ist.cmu.locmess.commands.LoginUserCommand;
 import pt.ulisboa.tecnico.ist.cmu.locmess.commands.RegisterUserCommand;
-import pt.ulisboa.tecnico.ist.cmu.locmess.exception.AlreadyRequestedException;
-import pt.ulisboa.tecnico.ist.cmu.locmess.exception.NotYetRequestedException;
+import pt.ulisboa.tecnico.ist.cmu.locmess.exception.DuplicateExecutionException;
+import pt.ulisboa.tecnico.ist.cmu.locmess.exception.CommandNotExecutedException;
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -55,11 +54,11 @@ public class RegisterActivity extends AppCompatActivity {
             }
         } catch (IOException e) {
             e.printStackTrace();
-        } catch (AlreadyRequestedException e) {
+        } catch (DuplicateExecutionException e) {
             e.printStackTrace();
         } catch (JSONException e) {
             e.printStackTrace();
-        } catch (NotYetRequestedException e) {
+        } catch (CommandNotExecutedException e) {
             e.printStackTrace();
         }
 
@@ -76,7 +75,7 @@ public class RegisterActivity extends AppCompatActivity {
                     c.execute();
                 } catch (IOException e) {
                     e.printStackTrace();
-                } catch (AlreadyRequestedException e) {
+                } catch (DuplicateExecutionException e) {
                     //FIXME: Handle this exception correctly
                     e.printStackTrace();
                 }

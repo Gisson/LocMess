@@ -1,13 +1,16 @@
+git:
+  depth: 3
+
 language: android
 android:
   components:
-    - extra-google-m2repository
-    - extra-android-m2repository
+#    - extra-google-m2repository
+#    - extra-android-m2repository
     - build-tools-25.0.0
-    - tools
     - platform-tools
+    - tools
     - extra-android-support
-    - extra-google-google_play_services
+#    - extra-google-google_play_services
     - android-16
     - android-21
     - android-22

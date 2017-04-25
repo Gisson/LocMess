@@ -5,8 +5,8 @@ import org.json.JSONException;
 import java.io.IOException;
 
 import pt.ulisboa.tecnico.ist.cmu.locmess.JsonParser;
-import pt.ulisboa.tecnico.ist.cmu.locmess.exception.AlreadyRequestedException;
-import pt.ulisboa.tecnico.ist.cmu.locmess.exception.NotYetRequestedException;
+import pt.ulisboa.tecnico.ist.cmu.locmess.exception.DuplicateExecutionException;
+import pt.ulisboa.tecnico.ist.cmu.locmess.exception.CommandNotExecutedException;
 
 /**
  * Created by jorge on 03/04/17.
@@ -23,11 +23,11 @@ public class LogoutUserCommand extends AbstractCommand {
     }
 
     @Override
-    public void execute() throws IOException, AlreadyRequestedException {
+    public void execute() throws IOException, DuplicateExecutionException {
         super.execute();
     }
 
-    public boolean successfulRequest() throws IOException, AlreadyRequestedException, JSONException, NotYetRequestedException {
+    public boolean successfulRequest() throws IOException, DuplicateExecutionException, JSONException, CommandNotExecutedException {
         return JsonParser.getValue(super.getResponse(),"response").equals("success");
     }
 }
