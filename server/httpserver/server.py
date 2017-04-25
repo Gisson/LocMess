@@ -145,7 +145,9 @@ class PostMessageHandler(tornado.web.RequestHandler):
                     l.postMessage(author,self.get_argument("message"))
                     self.write(json.dumps({'type': 'postMessage','response': 'success'}\
                     ,indent=4,separators=(',', ': ')))
-                    break
+                    return;
+            self.write(json.dumps({'type': 'postMessage','response': 'failure','reason':'no_such_location'}\
+             ,indent=4,separators=(',', ': ')))
         except LoginError:
             self.write(json.dumps({'type': 'postMessage','response': 'failure','reason':'invalid_token'}\
              ,indent=4,separators=(',', ': ')))
