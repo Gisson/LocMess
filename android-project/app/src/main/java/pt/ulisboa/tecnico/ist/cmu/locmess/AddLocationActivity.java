@@ -4,13 +4,19 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
+import android.widget.Toast;
+
+import pt.ulisboa.tecnico.ist.cmu.locmess.commands.AddLocationCommand;
 
 public class AddLocationActivity extends AppCompatActivity {
 
     EditText nameEt, gpsEt, ssidEt, bssidEt;
+
+    AddLocationCommand command;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -38,19 +44,62 @@ public class AddLocationActivity extends AppCompatActivity {
         int id = menuItem.getItemId();
 
         if (id == R.id.action_add) {
-            //here go back to locations and get data
-            Intent i = new Intent(AddLocationActivity.this, LocationsMenuActivity.class);
-            i.putExtra("name", nameEt.getText().toString());
-            i.putExtra("gps", gpsEt.getText().toString());
-            i.putExtra("ssid", ssidEt.getText().toString());
-            i.putExtra("bssid", bssidEt.getText().toString());
-            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(i);
-            finish();
+            //here run add location command
+
+            //Get lat, lon and radius from entered string
+            String[] gpsData = gpsEt.getText().toString().split(",");
+            String lat, lon, radius;
+            try {
+                lat = gpsData[0];
+            }catch (IndexOutOfBoundsException e){
+                lat = "";
+            }
+            try{
+                lon = gpsData[1];
+            }catch (IndexOutOfBoundsException e){
+                lon = "";
+            }
+            try{
+                radius = gpsData[2];
+            }catch (IndexOutOfBoundsException e){
+                radius = "";
+            }
+
+            command=new AddLocationCommand(LocMessManager.getInstance().getToken(),
+                    nameEt.getText().toString(),
+                    lat, lon, radius,
+                    ssidEt.getText().toString(),
+                    bssidEt.getText().toString());
+
+            //We Running async task in Manager and catch errors
+            LocMessManager.getInstance().executeAsync(command, new LocMessManager.CompleteCallback() {
+                @Override
+                public void OnComplete(boolean result, String message) {
+                    if(validateRequest()){
+                        Toast.makeText(AddLocationActivity.this, "Success", Toast.LENGTH_SHORT).show();
+                        Intent i = new Intent(AddLocationActivity.this, LocationsMenuActivity.class);
+                        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(i);
+                        finish();
+                    } else {
+                        Toast.makeText(AddLocationActivity.this, message, Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
         } else if (menuItem.getItemId() == android.R.id.home) {
             onBackPressed();
         }
         return super.onOptionsItemSelected(menuItem);
+    }
+
+    //Here I get Fail even if request is success, because if location is successfully added we receive an empty body
+    public boolean validateRequest(){
+        boolean result;
+        try{
+            result = command != null && command.successfulRequest();
+        } catch (Exception e){
+            result = false;
+        }
+        return  result;
     }
 }

@@ -1,11 +1,15 @@
 package pt.ulisboa.tecnico.ist.cmu.locmess.commands;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import pt.ulisboa.tecnico.ist.cmu.locmess.JsonParser;
 import pt.ulisboa.tecnico.ist.cmu.locmess.exception.DuplicateExecutionException;
 import pt.ulisboa.tecnico.ist.cmu.locmess.exception.CommandNotExecutedException;
 
@@ -17,6 +21,11 @@ public abstract class AbstractCommand {
 
     private final String SERVERADDR="pikachu.rnl.tecnico.ulisboa.pt";
     private final Integer SERVERPORT=31000;
+
+    private final int TIMEOUT = 10000;
+
+    private int responseCode = 0;
+
     private String _endpoint,_args,_response;
     protected boolean _executed=false;
 
@@ -37,6 +46,11 @@ public abstract class AbstractCommand {
         URL url=new URL("http://"+SERVERADDR+":"+SERVERPORT.toString()+"/"+_endpoint+"?"+_args);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");
+        //set some timeout for network request
+        connection.setConnectTimeout(TIMEOUT);
+        connection.setReadTimeout(TIMEOUT);
+        //get HTTP network code (200 - is OK)
+        responseCode = connection.getResponseCode();
         BufferedReader in = new BufferedReader(
                 new InputStreamReader(connection.getInputStream()));
         String inputLine;
@@ -55,7 +69,16 @@ public abstract class AbstractCommand {
             throw new CommandNotExecutedException();
         }
         return _response;
+    }
 
+    public boolean successfulRequest() throws IOException, DuplicateExecutionException, JSONException, CommandNotExecutedException {
+        return JsonParser.getValue(getResponse(),"response").equals("success");
+    }
+
+    //Get reason of task fail
+    public String getReason() throws CommandNotExecutedException, JSONException{
+        JSONObject obj=new JSONObject(getResponse());
+        return obj.getString("reason");
     }
 
     public String getAddr(){
@@ -66,4 +89,7 @@ public abstract class AbstractCommand {
         return SERVERPORT;
     }
 
+    public int getResponseCode(){
+        return  responseCode;
+    }
 }

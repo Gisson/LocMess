@@ -22,8 +22,8 @@ public class ListMessagesCommand extends AbstractCommand {
     private static final String _endpoint="listMessages";
     private HashMap<String,HashMap<String,String>> _results=null;
 
-    public ListMessagesCommand(String token) {
-        super(_endpoint,"token="+token);
+    public ListMessagesCommand(String token, String location) {
+        super(_endpoint,"token="+token+"&location="+location);
     }
 
     @Override

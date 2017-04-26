@@ -7,6 +7,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.Window;
 import android.widget.EditText;
@@ -54,9 +55,18 @@ public class MainActivity extends AppCompatActivity {
         String username=((EditText)findViewById(R.id.username_input)).getText().toString();
         String passwd=((EditText)findViewById(R.id.password_input)).getText().toString();
         command=new LoginUserCommand(username, passwd);
+        LocMessManager.getInstance().executeAsync(command, new LocMessManager.CompleteCallback() {
+            @Override
+            public void OnComplete(boolean result, String message) {
+                if(result){
+                    login();
+                } else if(!TextUtils.isEmpty(message)){
+                    Toast.makeText(MainActivity.this, message, Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
 
-
-        (new LoginAsync()).execute(command);
+//        (new LoginAsync()).execute(command);
 
     }
 
@@ -74,27 +84,31 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private class LoginAsync extends AsyncTask<LoginUserCommand,Void,Boolean>{
-
-        @Override
-        protected Boolean doInBackground(LoginUserCommand... loginCommand) {
-            for( AbstractCommand c : loginCommand){
-                try {
-                    c.execute();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (DuplicateExecutionException e) {
-                    //FIXME: Handle this exception correctly
-                    e.printStackTrace();
-                }
-            }
-
-            return true;
-        }
-
-        @Override
-        protected void onPostExecute(Boolean aBoolean) {
-            login();
-        }
-    }
+//    private class LoginAsync extends AsyncTask<LoginUserCommand,Void,Boolean>{
+//
+//        @Override
+//        protected Boolean doInBackground(LoginUserCommand... loginCommand) {
+//
+//            for( AbstractCommand c : loginCommand){
+//                try {
+//                    c.execute();
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                } catch (AlreadyRequestedException e) {
+//                    //FIXME: Handle this exception correctly
+//                    e.printStackTrace();
+//                }
+//            }
+//
+//            return true;
+//        }
+//
+//        @Override
+//        protected void onPostExecute(Boolean aBoolean) {
+////            login();
+//
+//            Intent i = new Intent(MainActivity.this, LocationsMenuActivity.class);
+//            startActivity(i);
+//        }
+//    }
 }
