@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONException;
@@ -50,6 +51,9 @@ public class MyProfile extends AppCompatActivity {
 
         fab = (FloatingActionButton) findViewById(R.id.abAddTopic);
         fab.setEnabled(false);
+
+        TextView tvUsername = (TextView) findViewById(R.id.username);
+        tvUsername.setText(manager.getUsername());
 
         final ListKeysCommand request = new ListKeysCommand(manager.getToken());
         manager.executeAsync(request, new LocMessManager.CompleteCallback() {

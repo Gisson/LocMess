@@ -26,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
     public static final int RUNNING=0;
     public static final int COMPLETED=1;
     private LoginUserCommand command;
+    private LocMessManager manager = LocMessManager.getInstance();
 
     public Handler mHandler;
 
@@ -73,7 +74,10 @@ public class MainActivity extends AppCompatActivity {
     public void login(){
         try {
             String token = command.getToken();
-            LocMessManager.getInstance().setToken(token);
+            manager.setToken(token);
+            String username = command.getUsername();
+            manager.setUsername(username);
+            // FIXME storing the token and username should be done by the manager somehow
             Toast.makeText(getApplicationContext(),"Login successful", Toast.LENGTH_SHORT).show();
             Intent i = new Intent(this, LocationsMenuActivity.class);
             startActivity(i);

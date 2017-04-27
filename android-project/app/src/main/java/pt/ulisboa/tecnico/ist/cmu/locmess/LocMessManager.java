@@ -24,7 +24,8 @@ public class LocMessManager {
     }
 
     private static LocMessManager _manager=null;
-    private String _currentToken;
+    private String _currentToken = "undefined";
+    private String _username = "undefined";
 
 
     protected LocMessManager(){
@@ -113,5 +114,11 @@ public class LocMessManager {
     }
     public String getToken(){
         return _currentToken;
+    }
+    public void setUsername(String username) {
+        _username = username;
+    }
+    public String getUsername() {
+        return _username;
     }
 }

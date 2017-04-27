@@ -18,10 +18,12 @@ public class LoginUserCommand extends AbstractCommand {
     private static final String _endpoint="loginUser";
     private String _token;
     private boolean _success=false;
+    private String _username;
 
 
     public LoginUserCommand(String username, String password){
         super(_endpoint,"username="+username+"&password="+password);
+        _username = username;
     }
 
     @Override
@@ -43,6 +45,17 @@ public class LoginUserCommand extends AbstractCommand {
         }
         if( _success) {
             return _token;
+        }
+        else {
+            throw new LoginFailedException();
+        }
+    }
+    public String getUsername() throws CommandNotExecutedException, LoginFailedException {
+        if(!_executed){
+            throw new CommandNotExecutedException();
+        }
+        if( _success) {
+            return _username;
         }
         else {
             throw new LoginFailedException();
