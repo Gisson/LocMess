@@ -77,6 +77,7 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(),"Login successful", Toast.LENGTH_SHORT).show();
             Intent i = new Intent(this, LocationsMenuActivity.class);
             startActivity(i);
+            this.finish();
         }catch(LoginFailedException e){
             Toast.makeText(getApplicationContext(),"Login failed", Toast.LENGTH_SHORT).show();
         } catch (CommandNotExecutedException e) {

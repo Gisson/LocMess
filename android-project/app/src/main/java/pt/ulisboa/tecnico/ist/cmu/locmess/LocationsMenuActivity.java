@@ -85,7 +85,8 @@ public class LocationsMenuActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_profile) {
-            // Handle the camera action
+            Intent i = new Intent(LocationsMenuActivity.this, MyProfile.class);
+            startActivity(i);
         } else if (id == R.id.nav_my_messages) {
             Intent i = new Intent(LocationsMenuActivity.this, MyMessagesMenuActivity.class);
             startActivity(i);
