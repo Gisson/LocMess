@@ -11,6 +11,7 @@ import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import java.util.Collections;
 import java.util.List;
 
 import pt.ulisboa.tecnico.ist.cmu.locmess.R;
@@ -24,10 +25,16 @@ public class TopicsListAdapter extends BaseAdapter {
     protected static final String TAG = "TopicsListAdapter";
     private List<String> topics;
     private Activity activity;
+    private NewItemCallback newItemCallback = null;
 
     public TopicsListAdapter(List<String> topics, Activity parentActivity) {
-        this.topics = topics;
+        this(topics, parentActivity, null);
+    }
+
+    public TopicsListAdapter(List<String> topics, Activity parentActivity, NewItemCallback newItemCallback) {
+        this.topics = Collections.synchronizedList(topics);
         this.activity = parentActivity;
+        this.newItemCallback = newItemCallback;
     }
 
     @Override
@@ -85,6 +92,11 @@ public class TopicsListAdapter extends BaseAdapter {
         return 1; // all our items are of the same view
     }
 
+    public interface NewItemCallback {
+        /** indicates that the item at index was just created/edited */
+        void onNewItem(int index);
+    };
+
     /**
      * @brief creates and shows a dialog to edit the topic at the given index
      */
@@ -106,6 +118,8 @@ public class TopicsListAdapter extends BaseAdapter {
                     topics.remove(index);
                 } else {
                     topics.set(index, text);
+                    if(newItemCallback != null)
+                        newItemCallback.onNewItem(index);
                 }
                 TopicsListAdapter.this.notifyDataSetChanged();
             }
