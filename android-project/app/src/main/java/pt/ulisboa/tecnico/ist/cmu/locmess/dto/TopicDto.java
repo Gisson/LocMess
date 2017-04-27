@@ -31,7 +31,7 @@ public class TopicDto implements LocMessDto {
 
     public String getKey() { return key; }
     public String getValue() { return value; }
-    public String getTopic() {
+    public String toString() {
         return key + "=" + value;
     }
 }
