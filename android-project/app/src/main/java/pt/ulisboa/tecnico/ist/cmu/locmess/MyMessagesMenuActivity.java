@@ -34,6 +34,7 @@ public class MyMessagesMenuActivity extends AppCompatActivity
 
     private ArrayList<String> messages;
     private MessageListAdapter messagesAdapter;
+    private static final String TAG = "MyMessagesActivity";
 
     private ListMessagesCommand command;
 
@@ -78,8 +79,8 @@ public class MyMessagesMenuActivity extends AppCompatActivity
                 }
             }
         });
-    }
 
+    }
     private void  populateData(){
         try {
             //Parse received messages
@@ -91,6 +92,14 @@ public class MyMessagesMenuActivity extends AppCompatActivity
             messagesAdapter = new MessageListAdapter(messages, this);
             ListView messagesList = (ListView) findViewById(R.id.messages_list);
             messagesList.setAdapter(messagesAdapter);
+            ((FloatingActionButton) findViewById(R.id.add_message)).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Log.v(TAG, "Action Button clicked");
+                    startActivity(new Intent(getApplicationContext(),NewMessageActivity.class));
+                }
+            });
+            ((FloatingActionButton) findViewById(R.id.add_message)).setEnabled(true);
         }catch( LocMessHttpException e) {
             Toast.makeText(MyMessagesMenuActivity.this,e.getReason(),Toast.LENGTH_SHORT);
         }catch (Exception e){
@@ -122,9 +131,11 @@ public class MyMessagesMenuActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_profile) {
-            // Actully do Nothing
-        } else if (id == R.id.nav_my_messages) {
             Intent i=new Intent(getApplicationContext(),MyProfile.class);
+            startActivity(i);
+
+        } else if (id == R.id.nav_my_messages) {
+            Intent i=new Intent(getApplicationContext(),MyMessagesMenuActivity.class);
             startActivity(i);
 
         } else if (id == R.id.nav_help) {
@@ -138,5 +149,24 @@ public class MyMessagesMenuActivity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return false;
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        command = new ListMessagesCommand(LocMessManager.getInstance().getToken());
+
+        //Run in Manager and catch errors
+        LocMessManager.getInstance().executeAsync(command, new LocMessManager.CompleteCallback() {
+            @Override
+            public void OnComplete(boolean result, String message) {
+                if(result){
+                    Toast.makeText(MyMessagesMenuActivity.this, "Success", Toast.LENGTH_SHORT).show();
+                    populateData();
+                } else {
+                    Toast.makeText(MyMessagesMenuActivity.this, message, Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 }
