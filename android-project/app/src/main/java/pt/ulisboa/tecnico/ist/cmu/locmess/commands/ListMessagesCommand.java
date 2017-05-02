@@ -8,8 +8,10 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import pt.ulisboa.tecnico.ist.cmu.locmess.dto.MessageDto;
 import pt.ulisboa.tecnico.ist.cmu.locmess.exception.DuplicateExecutionException;
 import pt.ulisboa.tecnico.ist.cmu.locmess.exception.CommandNotExecutedException;
+import pt.ulisboa.tecnico.ist.cmu.locmess.exception.LocMessHttpException;
 
 /**
  * Created by jorge on 03/04/17.
@@ -20,10 +22,13 @@ public class ListMessagesCommand extends AbstractCommand {
     //TODO
 
     private static final String _endpoint="listMessages";
-    private HashMap<String,HashMap<String,String>> _results=null;
+    private HashMap<String,MessageDto> _results=null;
 
     public ListMessagesCommand(String token, String location) {
         super(_endpoint,"token="+token+"&location="+location);
+    }
+    public ListMessagesCommand(String token){
+        super(_endpoint,"token="+token);
     }
 
     @Override
@@ -31,17 +36,21 @@ public class ListMessagesCommand extends AbstractCommand {
         super.execute();
     }
 
-    public Map<String,HashMap<String,String>> getResults() throws IOException, DuplicateExecutionException, JSONException, CommandNotExecutedException {
+    public Map<String,MessageDto> getResults() throws IOException, LocMessHttpException, JSONException {
+        if(!successfulRequest()){
+            throw new LocMessHttpException(getReason());
+        }
         if(_results==null){
             JSONObject obj=new JSONObject(getResponse());
             JSONArray arr=obj.getJSONArray("messages");
-            _results=new HashMap<String,HashMap<String,String>>();
-            HashMap<String,String> references;
+            _results=new HashMap<String,MessageDto>();
             for(int i=0; i<arr.length(); i++){
-                references=new HashMap<String,String>();
-                references.put("Author",arr.getJSONObject(i).getJSONObject("references").getString("Author"));
-                references.put("Content",arr.getJSONObject(i).getJSONObject("references").getString("Content"));
-                _results.put(references.put("Id",arr.getJSONObject(i).getJSONObject("messages").getString("Id")),references);
+                _results.put(arr.getJSONObject(i).getString("Id"),
+                        new MessageDto(arr.getJSONObject(i).getString("Author"),
+                                arr.getJSONObject(i).getString("Content"),
+                                arr.getJSONObject(i).getString("Title"),
+                                arr.getJSONObject(i).getString("Location")
+                                ));
             }
         }
         return _results;

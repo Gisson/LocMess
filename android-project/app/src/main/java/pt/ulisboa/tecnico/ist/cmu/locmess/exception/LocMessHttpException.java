@@ -15,4 +15,6 @@ public class LocMessHttpException extends Exception {
         _reason=reason;
     }
 
+    public String getReason(){return _reason;}
+
 }

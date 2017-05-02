@@ -15,8 +15,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import pt.ulisboa.tecnico.ist.cmu.locmess.adapters.MessageListAdapter;
+
 public class LocationsMenuActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+
+    private MessageListAdapter _messages;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

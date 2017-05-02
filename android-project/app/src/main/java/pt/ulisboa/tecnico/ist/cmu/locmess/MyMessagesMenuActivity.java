@@ -2,6 +2,7 @@ package pt.ulisboa.tecnico.ist.cmu.locmess;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Message;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -23,13 +24,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import pt.ulisboa.tecnico.ist.cmu.locmess.adapters.MessageListAdapter;
 import pt.ulisboa.tecnico.ist.cmu.locmess.commands.ListMessagesCommand;
+import pt.ulisboa.tecnico.ist.cmu.locmess.dto.MessageDto;
+import pt.ulisboa.tecnico.ist.cmu.locmess.exception.LocMessHttpException;
 
 public class MyMessagesMenuActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener{
 
     private ArrayList<String> messages;
-    private BaseAdapter messagesAdapter;
+    private MessageListAdapter messagesAdapter;
 
     private ListMessagesCommand command;
 
@@ -42,7 +46,9 @@ public class MyMessagesMenuActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        ListView messagesList = (ListView) findViewById(R.id.messages_list);
+
+
+
 
 
         setTitle("My Messages");
@@ -58,7 +64,7 @@ public class MyMessagesMenuActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        command = new ListMessagesCommand(LocMessManager.getInstance().getToken(), "");
+        command = new ListMessagesCommand(LocMessManager.getInstance().getToken());
 
         //Run in Manager and catch errors
         LocMessManager.getInstance().executeAsync(command, new LocMessManager.CompleteCallback() {
@@ -77,10 +83,20 @@ public class MyMessagesMenuActivity extends AppCompatActivity
     private void  populateData(){
         try {
             //Parse received messages
-            myMessages = command.getResults();
+            ArrayList<MessageDto> messages = new ArrayList<>();
+            Map<String, MessageDto> bla = command.getResults();
+            for (MessageDto m : command.getResults().values()) {
+                messages.add(m);
+            }
+            messagesAdapter = new MessageListAdapter(messages, this);
+            ListView messagesList = (ListView) findViewById(R.id.messages_list);
+            messagesList.setAdapter(messagesAdapter);
+        }catch( LocMessHttpException e) {
+            Toast.makeText(MyMessagesMenuActivity.this,e.getReason(),Toast.LENGTH_SHORT);
         }catch (Exception e){
             //Still not receiving the messages? I need to fix this...
             Log.e("MESSAGES", "Request success but we do not receive any messages");
+            e.printStackTrace();
         }
     }
 
@@ -108,13 +124,15 @@ public class MyMessagesMenuActivity extends AppCompatActivity
         if (id == R.id.nav_profile) {
             // Actully do Nothing
         } else if (id == R.id.nav_my_messages) {
+            Intent i=new Intent(getApplicationContext(),MyProfile.class);
+            startActivity(i);
 
         } else if (id == R.id.nav_help) {
             Toast.makeText(getApplication().getBaseContext(),"No help lel",Toast.LENGTH_SHORT).show();
 
 
         } else if (id == R.id.nav_logout) {
-
+            //TODO
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

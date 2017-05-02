@@ -27,14 +27,15 @@
         <activity
             android:name=".MyProfile"
             android:theme="@style/AppTheme.NoActionBar"
-            android:label="My Profile"
+            android:label="My Profile"></activity>
         <activity
             android:name=".LocationsMenuActivity"
             android:label="@string/title_activity_locations_menu"
             android:theme="@style/AppTheme.NoActionBar"></activity>
 
         <activity android:name=".MyMessagesMenuActivity"
-            android:theme="@style/AppTheme.NoActionBar"/>
+            android:theme="@style/AppTheme.NoActionBar"
+            android:parentActivityName=".LocationsMenuActivity"/>
 
         <activity android:name=".NewMessageActivity"/>
 

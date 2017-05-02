@@ -71,7 +71,7 @@ public class MessageListAdapter extends BaseAdapter {
         }
         holder.index = index;
 
- //       holder.text.setText(_messages.get(index));
+        holder.text.setText(_messages.get(index).getMessage());
         reusableView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

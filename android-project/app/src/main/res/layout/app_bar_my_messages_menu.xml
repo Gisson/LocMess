@@ -21,8 +21,6 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <include layout="@layout/content_my_messages" />
-
     <android.support.design.widget.FloatingActionButton
         android:onClick="newMessage"
         android:id="@+id/fab"
@@ -33,5 +31,9 @@
         app:backgroundTint="@color/colorPrimary"
         app:fabSize="normal"
         app:srcCompat="@android:drawable/ic_menu_add" />
+
+    <include layout="@layout/content_my_messages"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent" />
 
 </android.support.design.widget.CoordinatorLayout>
