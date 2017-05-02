@@ -9,6 +9,8 @@ import logging
 from LoginError import *
 from NoMessagesError import *
 import simplejson, json
+import ExpiredMessageError
+import traceback
 
 PORT=31000
 
@@ -48,14 +50,17 @@ class LoginHandler(tornado.web.RequestHandler):
 class LogoutHandler(tornado.web.RequestHandler):
     def get(self):
         for u in users:
-            if(u.isValidToken(self.get_argument("token"))):
-                u.remove_token()
-                self.write(json.dumps({'type': 'logout','response': 'success'}\
-                ,indent=4,separators=(',', ': ')))
-                break
-            else:
-                self.write(json.dumps({'type': 'logoutUser','response': 'failure'}\
-             ,indent=4,separators=(',', ': ')))
+            try:
+                if(u.isValidToken(self.get_argument("token"))):
+                    u.remove_token()
+                    self.write(json.dumps({'type': 'logout','response': 'success'}\
+                    ,indent=4,separators=(',', ': ')))
+                    break
+                else:
+                    self.write(json.dumps({'type': 'logoutUser','response': 'failure'}\
+                 ,indent=4,separators=(',', ': ')))
+            except AttributeError:
+                continue
 
 
 class ListLocationsHandler(tornado.web.RequestHandler):
@@ -142,7 +147,7 @@ class PostMessageHandler(tornado.web.RequestHandler):
             global locations
             for l in locations:
                 if self.get_argument("location")==l.getName():
-                    l.postMessage(author,self.get_argument("message"))
+                    l.postMessage(author,self.get_argument("message"),self.get_argument("title"),self.get_argument("deliveryMode"),self.get_argument("topics"),self.get_argument("endTime"))
                     self.write(json.dumps({'type': 'postMessage','response': 'success'}\
                     ,indent=4,separators=(',', ': ')))
                     return;
@@ -151,7 +156,8 @@ class PostMessageHandler(tornado.web.RequestHandler):
         except LoginError:
             self.write(json.dumps({'type': 'postMessage','response': 'failure','reason':'invalid_token'}\
              ,indent=4,separators=(',', ': ')))
-        except :
+        except Exception as e:
+            traceback.print_exc()
             self.write(json.dumps({'type': 'postMessage','response': 'failure'}\
              ,indent=4,separators=(',', ': ')))
 
@@ -179,28 +185,48 @@ class UnpostMessageHandler(tornado.web.RequestHandler):
 
 class ListMessagesHandler(tornado.web.RequestHandler):
     def get(self):
-        try:
-            getUserFromToken(self.get_argument("token"))
+        
+            u=getUserFromToken(self.get_argument("token"))
             global locations
             finalJson={'type':'listMessages','response':'success'}
-            locationName=self.get_argument("location")
-            for l in locations:
-                if l.getName()==locationName:
-                    messages={}
-                    for m in l.getMessages().values():
-                        messages[m.get_id()]=m.getJson()
-                    finalJson['messages']=messages
-                    break
-            self.write(json.dumps(finalJson ,indent=4,separators=(',', ': ')))
-        except LoginError:
-            self.write(json.dumps({'type': 'listMessages','response': 'failure','reason':'incorrect_token'}\
-             ,indent=4,separators=(',', ': ')))
-        except NoMessagesError:
-            self.write(json.dumps({'type': 'listMessages','response': 'failure','reason':'no_messages_found'}\
-             ,indent=4,separators=(',', ': ')))
-        except :
-            self.write(json.dumps({'type': 'listMessages','response': 'failure'}\
-             ,indent=4,separators=(',', ': ')))
+            try:
+                locationName=self.get_argument("location")
+            except tornado.web.MissingArgumentError:
+                    for l in locations:
+                        try:
+                            messages=[]
+                            for m in l.getMessages().values():
+                                if m.getAuthor() == u:
+                                    messages+=[m.getJson(),]
+                                finalJson['messages']=messages
+                        except NoMessagesError:
+                            continue;
+                    if messages =={}:
+                        self.write(json.dumps({'type': 'listMessages','response': 'failure','reason':'no_messages_found'}\
+                    ,indent=4,separators=(',', ': ')))
+                        return;
+                    self.write(json.dumps(finalJson ,indent=4,separators=(',', ': ')))
+                    return;
+
+            try:
+                for l in locations:
+                    if l.getName()==locationName:
+                        messages=[]
+                        for m in l.getMessages().values():
+                            messages+=[m.getJson(),]
+                        finalJson['messages']=messages
+                        break
+                self.write(json.dumps(finalJson ,indent=4,separators=(',', ': ')))
+            except LoginError:
+                self.write(json.dumps({'type': 'listMessages','response': 'failure','reason':'incorrect_token'}\
+                 ,indent=4,separators=(',', ': ')))
+            except NoMessagesError:
+                self.write(json.dumps({'type': 'listMessages','response': 'failure','reason':'no_messages_found'}\
+                 ,indent=4,separators=(',', ': ')))
+            except :
+                traceback.print_exc()
+                self.write(json.dumps({'type': 'listMessages','response': 'failure'}\
+                 ,indent=4,separators=(',', ': ')))
 
 
 ##################################################
@@ -266,8 +292,11 @@ def parseIDs(ids):
 def getUserFromToken(token):
     global users
     for u in users:
-        if u.isValidToken(token):
-            return u
+        try:
+            if u.isValidToken(token):
+                return u
+        except AttributeError:
+            continue
     raise LoginError
 
 def make_app():
@@ -290,6 +319,8 @@ if __name__=="__main__":
     app=make_app()
     logging.basicConfig(level=logging.DEBUG)
     logging.debug("Starting server...")
+    global messageId
+    messageId=0
     global users
     newuser=user("bla","bla")
     users=[newuser,]

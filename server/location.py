@@ -1,6 +1,7 @@
 from message import message
 from NoMessagesError import NoMessagesError
 from LoginError import LoginError
+import datetime
 
 class location:
 
@@ -48,9 +49,10 @@ class location:
     def getName(self):
         return self.name
 
-    def postMessage(self,author,content):
+    def postMessage(self,author,content,title,deliveryMode,topics,endTime):
         mId=self.messageIds
-        self.messages[mId]=message(author,self,content,mId)
+        self.messages[mId]=message(user=author,location=self,title=title,deliveryMode=deliveryMode,topics=topics\
+            ,endTime=datetime.datetime.now()+datetime.timedelta(seconds=int(endTime)),content=content,id=mId)
         self.messageIds+=1
         return mId
 

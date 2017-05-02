@@ -1,0 +1,4 @@
+
+
+class ExpiredMessageError(Exception):
+    pass
