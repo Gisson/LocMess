@@ -1,5 +1,7 @@
 package pt.ulisboa.tecnico.ist.cmu.locmess.commands;
 
+import android.util.Log;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -21,6 +23,7 @@ public abstract class AbstractCommand {
 
     private final String SERVERADDR="pikachu.rnl.tecnico.ulisboa.pt";
     private final Integer SERVERPORT=31000;
+    private final String TAG="AbstractCommand";
 
     private final int TIMEOUT = 10000;
 
@@ -43,6 +46,7 @@ public abstract class AbstractCommand {
         if(_executed){
             throw new DuplicateExecutionException();
         }
+        Log.d(TAG,"http://"+SERVERADDR+":"+SERVERPORT.toString()+"/"+_endpoint+"?"+_args);
         URL url=new URL("http://"+SERVERADDR+":"+SERVERPORT.toString()+"/"+_endpoint+"?"+_args);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");

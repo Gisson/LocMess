@@ -12,24 +12,18 @@ public class MessageDto implements LocMessDto {
     private String _author;
     private String _message;
     private String _title;
-    private List<String> _topics;
     private String _location;
+    private PolicyDto _policy;
+    private String _deliveryMode;
+    public static final String CENTRALIZED="Centralized";
+    public static final String DECENTRALIZED="Decentralized";
 
-    public MessageDto(String author, String message,String title,List<String> topics,String location){
+    public MessageDto(String author, String message,String title,String location,PolicyDto policy){
         _author=author;
         _message=message;
         _title=title;
-        _topics=topics;
         _location=location;
-    }
-
-    public MessageDto(String author, String message,String title,String topics, String location){
-        _author=author;
-        _message=message;
-        _title=title;
-        _topics=new ArrayList<>();
-        _topics.add(topics);
-        _location=location;
+        _policy = policy;
     }
 
     @Deprecated
@@ -38,6 +32,7 @@ public class MessageDto implements LocMessDto {
         _message=message;
         _title=title;
         _location=location;
+        _policy = new PolicyDto("",new ArrayList<TopicDto>());
     }
 
     public String getAuthor(){return _author;}
@@ -48,6 +43,7 @@ public class MessageDto implements LocMessDto {
 
     public String getLocation(){return _location;}
 
-    public List<String> getTopics(){return _topics;}
+    public PolicyDto getPolicy(){return _policy;}
+
 
 }

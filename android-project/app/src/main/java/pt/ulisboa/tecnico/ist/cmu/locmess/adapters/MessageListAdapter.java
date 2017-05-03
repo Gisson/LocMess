@@ -102,7 +102,9 @@ public class MessageListAdapter extends BaseAdapter {
         final View view1 = inflater.inflate(R.layout.dialog_read_message, null);
         final TextView dialogText = (TextView) view1.findViewById(R.id.textView);
         dialogText.setText("Author: "+_messages.get(index).getAuthor()+"\nContent: "+_messages.get(index).getMessage()
-                            +"\nLocation: "+_messages.get(index).getLocation()+"\nTopics: "+_messages.get(index).getTopics());
+                            +"\nLocation: "+_messages.get(index).getLocation()+"\nTopics: "+
+                            _messages.get(index).getPolicy().getTopics().toString()+"\nType: "+
+                            _messages.get(index).getPolicy().getType());
 
         builder.setView(view1);
         builder.show();
