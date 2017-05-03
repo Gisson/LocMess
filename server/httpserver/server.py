@@ -9,7 +9,7 @@ import logging
 from LoginError import *
 from NoMessagesError import *
 import simplejson, json
-import ExpiredMessageError
+from ExpiredMessageError import ExpiredMessageError
 import traceback
 
 PORT=31000
@@ -185,6 +185,7 @@ class UnpostMessageHandler(tornado.web.RequestHandler):
 
 class ListMessagesHandler(tornado.web.RequestHandler):
     def get(self):
+        try:
             try:
 
                 u=getUserFromToken(self.get_argument("token"))
@@ -200,8 +201,12 @@ class ListMessagesHandler(tornado.web.RequestHandler):
                         try:
                             messages=[]
                             for m in l.getMessages().values():
-                                if m.getAuthor() == u:
-                                    messages+=[m.getJson(),]
+                                try:
+                                    if m.getAuthor() == u:
+                                    
+                                        messages+=[m.getJson(),]
+                                except ExpiredMessageError:
+                                    continue;
                                 finalJson['messages']=messages
                         except NoMessagesError:
                             continue;
@@ -217,7 +222,10 @@ class ListMessagesHandler(tornado.web.RequestHandler):
                     if l.getName()==locationName:
                         messages=[]
                         for m in l.getMessages().values():
-                            messages+=[m.getJson(),]
+                            try:
+                                messages+=[m.getJson(),]
+                            except ExpiredMessageError:
+                                continue;
                         finalJson['messages']=messages
                         break
                 self.write(json.dumps(finalJson ,indent=4,separators=(',', ': ')))
@@ -227,10 +235,10 @@ class ListMessagesHandler(tornado.web.RequestHandler):
             except NoMessagesError:
                 self.write(json.dumps({'type': 'listMessages','response': 'failure','reason':'no_messages_found'}\
                  ,indent=4,separators=(',', ': ')))
-            except :
-                traceback.print_exc()
-                self.write(json.dumps({'type': 'listMessages','response': 'failure'}\
-                 ,indent=4,separators=(',', ': ')))
+        except :
+            traceback.print_exc()
+            self.write(json.dumps({'type': 'listMessages','response': 'failure'}\
+             ,indent=4,separators=(',', ': ')))
 
 
 ##################################################
