@@ -185,8 +185,12 @@ class UnpostMessageHandler(tornado.web.RequestHandler):
 
 class ListMessagesHandler(tornado.web.RequestHandler):
     def get(self):
-        
-            u=getUserFromToken(self.get_argument("token"))
+            try:
+
+                u=getUserFromToken(self.get_argument("token"))
+            except LoginError:
+                self.write(json.dumps({'type': 'listMessages','response': 'failure','reason':'incorrect_token'}\
+                 ,indent=4,separators=(',', ': ')))
             global locations
             finalJson={'type':'listMessages','response':'success'}
             try:
