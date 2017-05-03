@@ -1,5 +1,6 @@
 package pt.ulisboa.tecnico.ist.cmu.locmess;
 
+import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Message;
@@ -16,6 +17,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -79,7 +81,6 @@ public class MyMessagesMenuActivity extends AppCompatActivity
                 }
             }
         });
-
     }
     private void  populateData(){
         try {
@@ -169,4 +170,6 @@ public class MyMessagesMenuActivity extends AppCompatActivity
             }
         });
     }
+
+
 }

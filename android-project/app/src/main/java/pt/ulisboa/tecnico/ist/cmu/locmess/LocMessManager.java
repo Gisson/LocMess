@@ -2,6 +2,7 @@ package pt.ulisboa.tecnico.ist.cmu.locmess;
 
 import android.os.AsyncTask;
 import android.text.TextUtils;
+import android.widget.Toast;
 
 import org.json.JSONException;
 
@@ -11,6 +12,7 @@ import pt.ulisboa.tecnico.ist.cmu.locmess.commands.AbstractCommand;
 import pt.ulisboa.tecnico.ist.cmu.locmess.commands.LoginUserCommand;
 import pt.ulisboa.tecnico.ist.cmu.locmess.exception.CommandNotExecutedException;
 import pt.ulisboa.tecnico.ist.cmu.locmess.exception.DuplicateExecutionException;
+import pt.ulisboa.tecnico.ist.cmu.locmess.exception.LocMessHttpException;
 
 /**
  * Created by jorge on 03/04/17.
@@ -72,7 +74,9 @@ public class LocMessManager {
                     result = c.successfulRequest();
                 } catch (IOException e) {
                     e.printStackTrace();
+
                     message = "Can not complete request. Response code: " + c.getResponseCode();
+
                 } catch (DuplicateExecutionException e) {
                     //FIXME: Handle this exception correctly
                     e.printStackTrace();
