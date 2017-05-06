@@ -17,22 +17,24 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import pt.ulisboa.tecnico.ist.cmu.locmess.commands.AbstractCommand;
 import pt.ulisboa.tecnico.ist.cmu.locmess.commands.PostMessageCommand;
+import pt.ulisboa.tecnico.ist.cmu.locmess.dto.PolicyDto;
+import pt.ulisboa.tecnico.ist.cmu.locmess.dto.TopicDto;
 
 
 public class NewMessageActivity extends AppCompatActivity {
 
     private AbstractCommand command;
     private String TAG="NewMesageActivity";
-
+    private PolicyDto _policy=null;
     private String modes[] = new String[]{
             "Centralized",
             "Decentralized",
             "Mode"
     };
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -97,8 +99,8 @@ public class NewMessageActivity extends AppCompatActivity {
     }
 
     public void selectPolicy(View v){
-        Intent i = new Intent(this, SelectPolicyActivity.class);
-        startActivity(i);
+        Intent i = new Intent(this, EditPolicyActivity.class);
+        startActivityForResult(i, LocMessManager.PICK_POLICY_REQUEST);
     }
 
     public void selectLocation(View v){
@@ -107,6 +109,7 @@ public class NewMessageActivity extends AppCompatActivity {
         startActivityForResult(i, LocMessManager.PICK_LOCATION_REQUEST);
         //startActivity(i);
     }
+
 
     public void postMesage(View v){
         TextView location = (TextView)findViewById(R.id.location_name);
@@ -124,12 +127,16 @@ public class NewMessageActivity extends AppCompatActivity {
             Toast.makeText(this,"Please select policy.",Toast.LENGTH_SHORT).show();
             return;
         } TODO: check if works*/
+        if(_policy==null){
+            Toast.makeText(this,"Please select policy.",Toast.LENGTH_SHORT).show();
+            return;
+        }
         EditText content = (EditText) findViewById(R.id.message_content);
         EditText title = (EditText) findViewById(R.id.message_title_et);
         EditText lifespan = (EditText) findViewById(R.id.message_lifespan);
-        command = new PostMessageCommand(LocMessManager.getInstance().getToken(),"RNL"/*location.getText().toString().trim()*/,
+        command = new PostMessageCommand(LocMessManager.getInstance().getToken(),location.getText().toString().trim(),
                                             content.getText().toString().trim(),title.getText().toString(),
-                                            mode.getSelectedItem().toString(),new ArrayList<String>(),
+                                            mode.getSelectedItem().toString(),_policy,
                                             lifespan.getText().toString().trim());//Mock stuff
 
         //Run in Manager and catch errors
@@ -150,10 +157,25 @@ public class NewMessageActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data){
         Log.d(TAG,"Activity Result inc! The code is "+requestCode);
         if(requestCode == LocMessManager.PICK_LOCATION_REQUEST){
-            Log.d(TAG,"okokok");
             if( resultCode ==  RESULT_OK){
                 Log.d(TAG,"AND IT WAS SUCESSFUL!!!");
                 ((TextView) findViewById(R.id.location_name)).setText(data.getStringExtra("locationChoice"));
+            }
+        }
+        if(requestCode == LocMessManager.PICK_POLICY_REQUEST){
+            if(resultCode == RESULT_OK){
+                Log.d(TAG,"AND IT WAS SUCESSFUL!!!");
+                ((TextView) findViewById(R.id.select_policy)).setText(data.getStringExtra("policyType"));
+                Log.d(TAG,data.getSerializableExtra("topics").toString());
+                List<TopicDto> topics= new ArrayList<>();
+                for( String s : (ArrayList<String>) data.getSerializableExtra("topics")){ //TODO: CHANGE THIS WHEN CHANGED TO TOPICDTO
+                    topics.add(new TopicDto(s));
+                }
+                _policy=new PolicyDto(data.getStringExtra("policyType"),topics);
+                //_policy=new PolicyDto()
+
+                //data.getParcelableArrayExtra()
+                //_policy=new PolicyDto(data.getStringExtra("policyType"),)
             }
         }
     }

@@ -25,6 +25,7 @@ public class LocMessManager {
         void OnComplete(boolean result, String message);
     }
     public static final int PICK_LOCATION_REQUEST=1;
+    public static final int PICK_POLICY_REQUEST=2;
     private static LocMessManager _manager=null;
     private String _currentToken = "undefined";
     private String _username = "undefined";

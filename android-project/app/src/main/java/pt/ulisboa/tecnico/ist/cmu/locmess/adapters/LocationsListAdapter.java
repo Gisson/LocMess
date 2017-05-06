@@ -2,12 +2,14 @@ package pt.ulisboa.tecnico.ist.cmu.locmess.adapters;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Intent;
 import android.location.Location;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -67,13 +69,30 @@ public class LocationsListAdapter extends BaseAdapter {
         holder.index = index;
 
         holder.text.setText(_locations.get(index).getName());
-        reusableView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                final ViewHolder holder = (ViewHolder) view.getTag();
-                showEditTopicDialog(holder.index, getItem(holder.index).getName());
-            }
-        });
+        if(_activity.getIntent().getStringExtra("chooseLocation")!=null){
+            Toast.makeText(_activity,"This is to choose",Toast.LENGTH_SHORT).show();
+
+            reusableView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent returnItent = new Intent();
+                    returnItent.putExtra("locationChoice",getItem(index).getName());
+                    _activity.setResult(_activity.RESULT_OK,returnItent);
+                    _activity.finish();
+                }
+            });
+        }
+        else {
+            Toast.makeText(_activity,"This is not to choose",Toast.LENGTH_SHORT).show();
+
+            reusableView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    final ViewHolder holder = (ViewHolder) view.getTag();
+                    showLocation(holder.index, getItem(holder.index).getName());
+                }
+            });
+        }
         return reusableView;
     }
 
@@ -82,7 +101,7 @@ public class LocationsListAdapter extends BaseAdapter {
         int index;
     }
 
-    public void showEditTopicDialog(final int index, final String title) {
+    public void showLocation(final int index, final String title) {
         final AlertDialog.Builder builder = new AlertDialog.Builder(_activity);
         builder.setTitle(title);
 
