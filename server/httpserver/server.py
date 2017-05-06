@@ -147,7 +147,8 @@ class PostMessageHandler(tornado.web.RequestHandler):
             global locations
             for l in locations:
                 if self.get_argument("location")==l.getName():
-                    l.postMessage(author,self.get_argument("message"),self.get_argument("title"),self.get_argument("deliveryMode"),self.get_argument("topics"),self.get_argument("endTime"))
+                    l.postMessage(author,self.get_argument("message"),self.get_argument("title"),self.get_argument("deliveryMode"),self.get_argument("topics"),self.get_argument("endTime"),\
+                                    self.get_argument("policyType"))
                     self.write(json.dumps({'type': 'postMessage','response': 'success'}\
                     ,indent=4,separators=(',', ': ')))
                     return;

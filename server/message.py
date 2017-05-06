@@ -3,7 +3,7 @@ from ExpiredMessageError import ExpiredMessageError
 
 class message:
 
-    def __init__(self,user,location,title,deliveryMode,topics,endTime,content="",id=0):
+    def __init__(self,user,location,title,deliveryMode,topics,endTime,content="",id=0,policy="White"):
         self.author=user
         self.location=location
         self.content=content
@@ -13,6 +13,7 @@ class message:
         self.topics=topics
         self.endTime=endTime
         self.expired=False
+        self.policy=policy
 
     def getId(self):
             if self.isExpired():
@@ -44,6 +45,13 @@ class message:
             raise ExpiredMessageError
         else:
             return self.topics
+
+    def getPolicy(self):
+        if self.isExpired():
+            raise ExpiredMessageError
+        else:
+            return self.policy
+
     def isExpired(self):
         if self.expired:
             return True
@@ -73,4 +81,4 @@ class message:
     def __str__(self):
         return " Id: "+str(self.id)+"Author: "+self.author.getUsername()+" Title: "+self.title+ "Content: "+self.content+ "Location: "+self.location.getName()
     def getJson(self):
-        return {"Id":str(self.id),"Author":self.author.getUsername(),"Title":self.title,"Content":self.content,"Location":self.location.getName()}
+        return {"Id":str(self.id),"Author":self.author.getUsername(),"Title":self.title,"Content":self.content,"Location":self.location.getName(),"policyType":self.policy,"topics":self.topics}

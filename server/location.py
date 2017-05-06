@@ -49,10 +49,10 @@ class location:
     def getName(self):
         return self.name
 
-    def postMessage(self,author,content,title,deliveryMode,topics,endTime):
+    def postMessage(self,author,content,title,deliveryMode,topics,endTime,policyType):
         mId=self.messageIds
         self.messages[mId]=message(user=author,location=self,title=title,deliveryMode=deliveryMode,topics=topics\
-            ,endTime=datetime.datetime.now()+datetime.timedelta(seconds=int(endTime)),content=content,id=mId)
+            ,endTime=datetime.datetime.now()+datetime.timedelta(seconds=int(endTime)),content=content,id=mId,policy=policyType)
         self.messageIds+=1
         return mId
 
@@ -61,7 +61,7 @@ class location:
 
     def getJson(self):
         finalJson={'bssids':self.bssids,\
-        'ssids':self.ssids,'latitude':self.latitude,'longitude':self.longitude,'radius':self.radius}
+        'ssids':self.ssids,'latitude':self.latitude,'longitude':self.longitude,'radius':self.radius,'name':self.name}
         return finalJson
 
     def __cmp__(self,location):
