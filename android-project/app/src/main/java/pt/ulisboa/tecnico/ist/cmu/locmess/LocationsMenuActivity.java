@@ -29,7 +29,7 @@ public class LocationsMenuActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private LocationsListAdapter messagesAdapter;
-    private static final String TAG = "LocationsMeny";
+    private static final String TAG = "LocationsMenu";
     private ListLocationsCommand command;
 
     @Override
@@ -162,4 +162,5 @@ public class LocationsMenuActivity extends AppCompatActivity
         Intent i = new Intent(this, AddLocationActivity.class);
         startActivity(i);
     }
+
 }

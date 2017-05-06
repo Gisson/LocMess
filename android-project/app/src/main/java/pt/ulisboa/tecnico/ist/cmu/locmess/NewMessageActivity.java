@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatSpinner;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,6 +25,7 @@ import pt.ulisboa.tecnico.ist.cmu.locmess.commands.PostMessageCommand;
 public class NewMessageActivity extends AppCompatActivity {
 
     private AbstractCommand command;
+    private String TAG="NewMesageActivity";
 
     private String modes[] = new String[]{
             "Centralized",
@@ -101,7 +103,9 @@ public class NewMessageActivity extends AppCompatActivity {
 
     public void selectLocation(View v){
         Intent i = new Intent(this, LocationsMenuActivity.class);
-        startActivity(i);
+        i.putExtra("chooseLocation","true");
+        startActivityForResult(i, LocMessManager.PICK_LOCATION_REQUEST);
+        //startActivity(i);
     }
 
     public void postMesage(View v){
@@ -140,5 +144,17 @@ public class NewMessageActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data){
+        Log.d(TAG,"Activity Result inc! The code is "+requestCode);
+        if(requestCode == LocMessManager.PICK_LOCATION_REQUEST){
+            Log.d(TAG,"okokok");
+            if( resultCode ==  RESULT_OK){
+                Log.d(TAG,"AND IT WAS SUCESSFUL!!!");
+                ((TextView) findViewById(R.id.location_name)).setText(data.getStringExtra("locationChoice"));
+            }
+        }
     }
 }
