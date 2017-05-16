@@ -1,5 +1,8 @@
 package pt.ulisboa.tecnico.ist.cmu.locmess.dto;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 /**
  * Created by nuno on 26/04/17.
  */
@@ -7,6 +10,12 @@ package pt.ulisboa.tecnico.ist.cmu.locmess.dto;
 public class TopicDto implements LocMessDto {
     private String key;
     private String value;
+
+    public static class JsonAtributes{
+        public static final String KEY="key";
+        public static final String VALUE="value";
+
+    }
 
     @Override
     public boolean equals(Object obj) {
@@ -33,5 +42,16 @@ public class TopicDto implements LocMessDto {
     public String getValue() { return value; }
     public String toString() {
         return key + "=" + value;
+    }
+
+    public String toJson(){
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("key", key);
+            jsonObject.put("value", value);
+        } catch (JSONException e) {
+            e.toString();
+        }
+        return jsonObject.toString();
     }
 }

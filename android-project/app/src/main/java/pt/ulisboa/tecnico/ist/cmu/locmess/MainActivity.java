@@ -1,6 +1,12 @@
 package pt.ulisboa.tecnico.ist.cmu.locmess;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
+import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -8,6 +14,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.EditText;
@@ -15,16 +22,20 @@ import android.widget.Toast;
 
 import java.io.IOException;
 
+import pt.ulisboa.tecnico.ist.cmu.locmess.BroadcastReceivers.WifiScannerReceiver;
+import pt.ulisboa.tecnico.ist.cmu.locmess.Listeners.LocMessLocationListener;
 import pt.ulisboa.tecnico.ist.cmu.locmess.commands.AbstractCommand;
 import pt.ulisboa.tecnico.ist.cmu.locmess.commands.LoginUserCommand;
 import pt.ulisboa.tecnico.ist.cmu.locmess.exception.DuplicateExecutionException;
 import pt.ulisboa.tecnico.ist.cmu.locmess.exception.LoginFailedException;
 import pt.ulisboa.tecnico.ist.cmu.locmess.exception.CommandNotExecutedException;
+import pt.ulisboa.tecnico.ist.cmu.locmess.exception.NoNetworksAroundException;
 
 public class MainActivity extends AppCompatActivity {
 
     public static final int RUNNING=0;
     public static final int COMPLETED=1;
+    private static final String TAG = "MAINACTIVITY";
     private LoginUserCommand command;
     private LocMessManager manager = LocMessManager.getInstance();
 
@@ -37,6 +48,29 @@ public class MainActivity extends AppCompatActivity {
         /*getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);*/
         setContentView(R.layout.activity_main);
+
+
+/*
+        final Handler h = new Handler();
+        h.postDelayed(new Runnable()
+        {
+            private long time = 0;
+
+            @Override
+            public void run()
+            {
+                // do stuff then
+                // can call h again after work!
+                time += 1000;
+                Log.d("TimerExample", "Going for... " + time);
+                h.postDelayed(this, 1000);
+            }
+        }, 1000);
+
+*/
+
+
+
     }
 
     public void register(View v){
@@ -79,7 +113,12 @@ public class MainActivity extends AppCompatActivity {
             manager.setUsername(username);
             // FIXME storing the token and username should be done by the manager somehow
             Toast.makeText(getApplicationContext(),"Login successful", Toast.LENGTH_SHORT).show();
-            Intent i = new Intent(this, LocationsMenuActivity.class);
+
+            // Acquire a reference to the system Location Manager
+
+            Intent i = new Intent(this, MyMessagesMenuActivity.class);
+            LocMessLocationListener listener = new LocMessLocationListener();
+           // i.putExtra("nearby",true);
             startActivity(i);
             this.finish();
         }catch(LoginFailedException e){

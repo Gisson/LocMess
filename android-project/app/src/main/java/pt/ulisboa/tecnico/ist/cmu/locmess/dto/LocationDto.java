@@ -1,5 +1,9 @@
 package pt.ulisboa.tecnico.ist.cmu.locmess.dto;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,6 +16,14 @@ public class LocationDto implements LocMessDto {
     private String _name;
     private String _lat="",_longitude="",_radius="";
     private List<String> _wifiIds=null;
+
+    public static class JsonAtributes{
+        public static final String NAME="name";
+        public static final String LATITUDE="latitude";
+        public static final String LONGITUDE="longitude";
+        public static final String WIFIIDS="wifiids";
+
+    }
 
     @Deprecated
     private String wifiids;
@@ -70,5 +82,22 @@ public class LocationDto implements LocMessDto {
     @Deprecated
     public String getWifiids() {
         return wifiids;
+    }
+
+    public String toJson(){
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("name", _name);
+            jsonObject.put("latitude", _lat);
+            jsonObject.put("longitude", _longitude);
+            JSONArray arr = new JSONArray();
+            for(String wifiid : _wifiIds) {
+                arr.put(wifiid);
+            }
+            jsonObject.put("wifiids",arr);
+        } catch (JSONException e) {
+            e.toString();
+        }
+        return jsonObject.toString();
     }
 }

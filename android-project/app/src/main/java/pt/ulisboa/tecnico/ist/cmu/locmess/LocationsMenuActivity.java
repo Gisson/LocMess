@@ -28,6 +28,7 @@ import pt.ulisboa.tecnico.ist.cmu.locmess.exception.LocMessHttpException;
 public class LocationsMenuActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
+    public static final String CHOOSE_LOCATION="choose_location";
     private LocationsListAdapter messagesAdapter;
     private static final String TAG = "LocationsMenu";
     private ListLocationsCommand command;
@@ -36,20 +37,29 @@ public class LocationsMenuActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_locations_menu);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        if(!getIntent().getBooleanExtra(CHOOSE_LOCATION,false)) {
+            Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+            setSupportActionBar(toolbar);
+
+
+            DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+
+
+            ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                    this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+            drawer.setDrawerListener(toggle);
+
+            toggle.syncState();
+
+            NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view_locations);
+
+            navigationView.setNavigationItemSelectedListener(this);
+        }
 
 
 
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
 
 
         command = new ListLocationsCommand(LocMessManager.getInstance().getToken());
@@ -142,6 +152,13 @@ public class LocationsMenuActivity extends AppCompatActivity
             startActivity(i);
         } else if (id == R.id.nav_my_messages) {
             Intent i = new Intent(LocationsMenuActivity.this, MyMessagesMenuActivity.class);
+            startActivity(i);
+        }else if (id == R.id.nav_messages_nearbu){
+            Intent i = new Intent(getApplicationContext(), MyMessagesMenuActivity.class);
+            i.putExtra("nearby",true);
+            startActivity(i);
+        } else if (id == R.id.nav_locations) {
+            Intent i = new Intent(getApplicationContext(), LocationsMenuActivity.class);
             startActivity(i);
 
         } else if (id == R.id.nav_help) {

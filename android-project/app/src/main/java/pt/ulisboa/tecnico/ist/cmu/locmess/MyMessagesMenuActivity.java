@@ -1,7 +1,11 @@
 package pt.ulisboa.tecnico.ist.cmu.locmess;
 
 import android.app.ListActivity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.location.LocationListener;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Message;
 import android.support.annotation.NonNull;
@@ -20,23 +24,27 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import pt.ulisboa.tecnico.ist.cmu.locmess.LocMessActivityInterfaces.LocMessLocationNeedyActivity;
 import pt.ulisboa.tecnico.ist.cmu.locmess.adapters.MessageListAdapter;
 import pt.ulisboa.tecnico.ist.cmu.locmess.commands.ListMessagesCommand;
 import pt.ulisboa.tecnico.ist.cmu.locmess.dto.MessageDto;
 import pt.ulisboa.tecnico.ist.cmu.locmess.exception.LocMessHttpException;
+import pt.ulisboa.tecnico.ist.cmu.locmess.exception.NoNetworksAroundException;
 
-public class MyMessagesMenuActivity extends AppCompatActivity
+public class MyMessagesMenuActivity extends LocMessLocationNeedyActivity
         implements NavigationView.OnNavigationItemSelectedListener{
 
     private ArrayList<String> messages;
     private MessageListAdapter messagesAdapter;
     private static final String TAG = "MyMessagesActivity";
+    private String _locationName="";
 
     private ListMessagesCommand command;
 
@@ -50,11 +58,29 @@ public class MyMessagesMenuActivity extends AppCompatActivity
         setSupportActionBar(toolbar);
 
 
+//        LocMessManager.getInstance()._batteryReceiver = new BatteryScannerReceiver();
+ //       registerReceiver(LocMessManager.getInstance()._batteryReceiver,new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
 
 
+        try {
+            _locationName = LocMessManager.getInstance().findLocation(getLastLocation(),
+                    LocMessManager.getInstance().getClosestSsid(getWifiManager()).SSID);
+        }catch(NoNetworksAroundException e){
+            _locationName=LocMessManager.getInstance().findLocation(getLastLocation());
+            e.getMessage();
+        }
+        if( getIntent().getBooleanExtra("nearby",false)) {
+            if(_locationName.equals("")){
+                setTitle("Not in a known location");
+            }
+            else {
+                setTitle("Messages in " + _locationName);
+            }
+        }else{
+            setTitle("My Messages");
+        }
 
 
-        setTitle("My Messages");
 
 
 
@@ -64,23 +90,38 @@ public class MyMessagesMenuActivity extends AppCompatActivity
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view_messages);
         navigationView.setNavigationItemSelectedListener(this);
 
-        command = new ListMessagesCommand(LocMessManager.getInstance().getToken());
 
-        //Run in Manager and catch errors
-        LocMessManager.getInstance().executeAsync(command, new LocMessManager.CompleteCallback() {
-            @Override
-            public void OnComplete(boolean result, String message) {
-                if(result){
-                    Toast.makeText(MyMessagesMenuActivity.this, "Success", Toast.LENGTH_SHORT).show();
-                    populateData();
-                } else {
-                    Toast.makeText(MyMessagesMenuActivity.this, message, Toast.LENGTH_SHORT).show();
-                }
+        NavigationView nv = (NavigationView) findViewById(R.id.nav_view_messages);
+        View v = nv.getHeaderView(0);
+        TextView tvUsername = (TextView) v.findViewById(R.id.user_name);
+        tvUsername.setText(LocMessManager.getInstance().getUsername());
+        if(!_locationName.equals("")) {
+            Log.d(TAG, "" + getIntent().getBooleanExtra("nearby", false));
+            if (getIntent().getBooleanExtra("nearby", false)) {
+                command = new ListMessagesCommand(LocMessManager.getInstance().getToken(),
+                        _locationName);
+                Log.d(TAG, "Inside if");
+            } else {
+                command = new ListMessagesCommand(LocMessManager.getInstance().getToken());
+                Log.d(TAG, "Inside else");
             }
-        });
+
+            //Run in Manager and catch errors
+            LocMessManager.getInstance().executeAsync(command, new LocMessManager.CompleteCallback() {
+                @Override
+                public void OnComplete(boolean result, String message) {
+                    if (result) {
+                        Toast.makeText(MyMessagesMenuActivity.this, "Success", Toast.LENGTH_SHORT).show();
+                        populateData();
+                    } else {
+                        Toast.makeText(MyMessagesMenuActivity.this, message, Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+        }
     }
     private void  populateData(){
         try {
@@ -136,7 +177,15 @@ public class MyMessagesMenuActivity extends AppCompatActivity
             startActivity(i);
 
         } else if (id == R.id.nav_my_messages) {
-            Intent i=new Intent(getApplicationContext(),MyMessagesMenuActivity.class);
+            Intent i = new Intent(getApplicationContext(), MyMessagesMenuActivity.class);
+            startActivity(i);
+
+        }else if (id == R.id.nav_messages_nearbu){
+            Intent i = new Intent(getApplicationContext(), MyMessagesMenuActivity.class);
+            i.putExtra("nearby",true);
+            startActivity(i);
+        } else if (id == R.id.nav_locations) {
+            Intent i = new Intent(getApplicationContext(), LocationsMenuActivity.class);
             startActivity(i);
 
         } else if (id == R.id.nav_help) {
@@ -155,8 +204,11 @@ public class MyMessagesMenuActivity extends AppCompatActivity
     @Override
     public void onResume(){
         super.onResume();
-        command = new ListMessagesCommand(LocMessManager.getInstance().getToken());
-
+        if( getIntent().getBooleanExtra("nearby",false)) {
+            command = new ListMessagesCommand(LocMessManager.getInstance().getToken(),_locationName);
+        }else{
+            command = new ListMessagesCommand(LocMessManager.getInstance().getToken());
+        }
         //Run in Manager and catch errors
         LocMessManager.getInstance().executeAsync(command, new LocMessManager.CompleteCallback() {
             @Override

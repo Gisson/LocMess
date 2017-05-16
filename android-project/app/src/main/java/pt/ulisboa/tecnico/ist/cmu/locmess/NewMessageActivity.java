@@ -105,7 +105,7 @@ public class NewMessageActivity extends AppCompatActivity {
 
     public void selectLocation(View v){
         Intent i = new Intent(this, LocationsMenuActivity.class);
-        i.putExtra("chooseLocation","true");
+        i.putExtra(LocationsMenuActivity.CHOOSE_LOCATION,true);
         startActivityForResult(i, LocMessManager.PICK_LOCATION_REQUEST);
         //startActivity(i);
     }

@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Map;
 
 import pt.inesc.termite.wifidirect.sockets.SimWifiP2pSocketManager;
-import pt.ulisboa.tecnico.ist.cmu.locmess.BroadcastReceivers.BatteryScannerReceiver;
 import pt.ulisboa.tecnico.ist.cmu.locmess.BroadcastReceivers.WifiScannerReceiver;
 import pt.ulisboa.tecnico.ist.cmu.locmess.commands.AbstractCommand;
 import pt.ulisboa.tecnico.ist.cmu.locmess.commands.GetLocationCommand;

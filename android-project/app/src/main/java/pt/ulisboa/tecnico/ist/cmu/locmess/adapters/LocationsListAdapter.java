@@ -14,6 +14,8 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
+import pt.ulisboa.tecnico.ist.cmu.locmess.LocationsMenuActivity;
+import pt.ulisboa.tecnico.ist.cmu.locmess.NewMessageActivity;
 import pt.ulisboa.tecnico.ist.cmu.locmess.R;
 import pt.ulisboa.tecnico.ist.cmu.locmess.dto.LocationDto;
 
@@ -69,8 +71,8 @@ public class LocationsListAdapter extends BaseAdapter {
         holder.index = index;
 
         holder.text.setText(_locations.get(index).getName());
-        if(_activity.getIntent().getStringExtra("chooseLocation")!=null){
-            Toast.makeText(_activity,"This is to choose",Toast.LENGTH_SHORT).show();
+        if(_activity.getIntent().getBooleanExtra(LocationsMenuActivity.CHOOSE_LOCATION,false)){
+            //Toast.makeText(_activity,"This is to choose",Toast.LENGTH_SHORT).show();
 
             reusableView.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -83,7 +85,7 @@ public class LocationsListAdapter extends BaseAdapter {
             });
         }
         else {
-            Toast.makeText(_activity,"This is not to choose",Toast.LENGTH_SHORT).show();
+            //Toast.makeText(_activity,"This is not to choose",Toast.LENGTH_SHORT).show();
 
             reusableView.setOnClickListener(new View.OnClickListener() {
                 @Override
