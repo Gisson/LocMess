@@ -12,6 +12,15 @@
             android:title="My messages" />
 
         <item
+            android:id="@+id/nav_messages_nearbu"
+            android:icon="@drawable/ic_my_messages"
+            android:title="Messages Nearby" />
+        <item
+            android:id="@+id/nav_locations"
+            android:icon="@drawable/ic_locations"
+            android:title="Locations" />
+
+        <item
             android:id="@+id/nav_help"
             android:icon="@drawable/ic_help"
             android:title="Help" />

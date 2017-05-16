@@ -60,7 +60,7 @@
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:srcCompat="@mipmap/ic_launcher"
+        app:srcCompat="@mipmap/ic_launcher2"
         android:layout_marginTop="94dp"
         android:id="@+id/logo"
         android:layout_alignParentTop="true"
