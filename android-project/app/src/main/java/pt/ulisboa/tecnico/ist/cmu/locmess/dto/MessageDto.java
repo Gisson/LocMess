@@ -24,7 +24,7 @@ public class MessageDto implements LocMessDto {
     public static class JsonAtributes{
         public static final String AUTHOR="author";
         public static final String MESSAGE="message";
-        public static final String TITLE="TITLE";
+        public static final String TITLE="title";
         public static final String LOCATION="location";
         public static final String POLICY="policy";
 
@@ -62,11 +62,11 @@ public class MessageDto implements LocMessDto {
         JSONObject jsonObject = new JSONObject();
 
         try {
-            jsonObject.put("autor",_author);
-            jsonObject.put("message",_message);
-            jsonObject.put("title",_title);
-            jsonObject.put("location",_location);
-            jsonObject.put("policy",_policy.toJson());
+            jsonObject.put(JsonAtributes.AUTHOR,_author);
+            jsonObject.put(JsonAtributes.MESSAGE,_message);
+            jsonObject.put(JsonAtributes.TITLE,_title);
+            jsonObject.put(JsonAtributes.LOCATION,_location);
+            jsonObject.put(JsonAtributes.POLICY,_policy.toJson());
         } catch (JSONException e) {
             e.toString();
         }

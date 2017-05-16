@@ -3,7 +3,9 @@ package pt.ulisboa.tecnico.ist.cmu.locmess.wifiDirect;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.AsyncTask;
@@ -19,11 +21,14 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.UnknownHostException;
 
+import pt.inesc.termite.wifidirect.SimWifiP2pBroadcast;
 import pt.inesc.termite.wifidirect.SimWifiP2pDevice;
 import pt.inesc.termite.wifidirect.SimWifiP2pDeviceList;
 import pt.inesc.termite.wifidirect.SimWifiP2pInfo;
 import pt.inesc.termite.wifidirect.SimWifiP2pManager;
+import pt.inesc.termite.wifidirect.service.SimWifiP2pService;
 import pt.inesc.termite.wifidirect.sockets.SimWifiP2pSocket;
+import pt.inesc.termite.wifidirect.sockets.SimWifiP2pSocketManager;
 import pt.inesc.termite.wifidirect.sockets.SimWifiP2pSocketServer;
 import pt.ulisboa.tecnico.ist.cmu.locmess.LocMessActivityInterfaces.LocMessActivity;
 import pt.ulisboa.tecnico.ist.cmu.locmess.dto.LocationDto;
@@ -67,8 +72,16 @@ public class WifiP2PHandler implements SimWifiP2pManager.PeerListListener, SimWi
         }
     };
 
-    public WifiP2PHandler(Activity activity){
+    public WifiP2PHandler(Activity activity,IntentFilter intent){
         _activity = activity;
+        SimWifiP2pSocketManager.Init(_activity.getApplicationContext());
+        _filter=intent;
+        _filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_STATE_CHANGED_ACTION);
+        _filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_PEERS_CHANGED_ACTION);
+        _filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_NETWORK_MEMBERSHIP_CHANGED_ACTION);
+        _filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_GROUP_OWNERSHIP_CHANGED_ACTION);
+        _receiver = new SimWifiP2pBroadcastReceiver(_activity);
+        _activity.registerReceiver(_receiver,_filter);
     }
 
 
@@ -225,6 +238,13 @@ public class WifiP2PHandler implements SimWifiP2pManager.PeerListListener, SimWi
             @Override
             protected void onProgressUpdate(String... values) {
                     Log.d(TAG,"Received message!");
+                try {
+                    JSONObject jsonObject = new JSONObject(values[0]);
+                    Log.d(TAG,"Message came from "+jsonObject.getString(
+                            WifiDirectMessageDto.JsonAtributes.AUTHOR));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
 
             }
         }
@@ -257,6 +277,24 @@ public class WifiP2PHandler implements SimWifiP2pManager.PeerListListener, SimWi
         WifiDirectMessageDto message = new WifiDirectMessageDto(author,content,title,locationName,policy,userTo);
         new SendCommTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,sendTo,message.toJson());
 
+    }
+
+    public void wifiOn() {
+        if (_bound)
+            return;
+        Intent intent = new Intent(_activity, SimWifiP2pService.class);
+        _activity.bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
+        _bound = true;
+
+        new IncommingCommTask().executeOnExecutor(
+                AsyncTask.THREAD_POOL_EXECUTOR);
+    }
+
+    public void wifiOff() {
+        if (_bound) {
+            _activity.unbindService(mConnection);
+            _bound = false;
+        }
     }
 
 

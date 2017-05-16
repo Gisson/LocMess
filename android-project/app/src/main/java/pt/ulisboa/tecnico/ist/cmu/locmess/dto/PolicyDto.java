@@ -34,12 +34,12 @@ public class PolicyDto implements LocMessDto {
     public String toJson(){
         JSONObject jsonObject = new JSONObject();
         try {
-            jsonObject.put("type", _type);
+            jsonObject.put(JsonAtributes.TYPE, _type);
             JSONArray arr = new JSONArray();
             for(TopicDto topic : _topics) {
                 arr.put(topic.toJson());
             }
-            jsonObject.put("topics",arr);
+            jsonObject.put(JsonAtributes.TOPICS,arr);
         } catch (JSONException e) {
             e.toString();
         }

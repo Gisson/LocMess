@@ -87,14 +87,14 @@ public class LocationDto implements LocMessDto {
     public String toJson(){
         JSONObject jsonObject = new JSONObject();
         try {
-            jsonObject.put("name", _name);
-            jsonObject.put("latitude", _lat);
-            jsonObject.put("longitude", _longitude);
+            jsonObject.put(JsonAtributes.NAME, _name);
+            jsonObject.put(JsonAtributes.LATITUDE, _lat);
+            jsonObject.put(JsonAtributes.LONGITUDE, _longitude);
             JSONArray arr = new JSONArray();
             for(String wifiid : _wifiIds) {
                 arr.put(wifiid);
             }
-            jsonObject.put("wifiids",arr);
+            jsonObject.put(JsonAtributes.WIFIIDS,arr);
         } catch (JSONException e) {
             e.toString();
         }

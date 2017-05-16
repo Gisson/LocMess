@@ -34,6 +34,7 @@ import pt.ulisboa.tecnico.ist.cmu.locmess.exception.DuplicateExecutionException;
 import pt.ulisboa.tecnico.ist.cmu.locmess.exception.LocMessHttpException;
 import pt.ulisboa.tecnico.ist.cmu.locmess.exception.NoLocationException;
 import pt.ulisboa.tecnico.ist.cmu.locmess.exception.NoNetworksAroundException;
+import pt.ulisboa.tecnico.ist.cmu.locmess.wifiDirect.WifiP2PHandler;
 
 /**
  * Created by jorge on 03/04/17.
@@ -58,7 +59,7 @@ public class LocMessManager {
 //    private LocationManager locationManager;
     public WifiManager mWifiManager = null;
 //    public BatteryScannerReceiver _batteryReceiver;
-
+    private WifiP2PHandler _wifihandler;
 
     protected LocMessManager(){
 
@@ -253,6 +254,14 @@ public class LocMessManager {
         WifiScannerReceiver mWifiScanReceiver = new WifiScannerReceiver(mWifiManager);
     }
 
+
+    public WifiP2PHandler getWifiHandler(){
+        return _wifihandler;
+    }
+
+    public void setWifiHandler(WifiP2PHandler handler){
+        _wifihandler = handler;
+    }
 
 
 }

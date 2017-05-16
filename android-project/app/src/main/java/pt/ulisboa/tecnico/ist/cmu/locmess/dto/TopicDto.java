@@ -47,8 +47,8 @@ public class TopicDto implements LocMessDto {
     public String toJson(){
         JSONObject jsonObject = new JSONObject();
         try {
-            jsonObject.put("key", key);
-            jsonObject.put("value", value);
+            jsonObject.put(JsonAtributes.KEY, key);
+            jsonObject.put(JsonAtributes.VALUE, value);
         } catch (JSONException e) {
             e.toString();
         }

@@ -30,6 +30,7 @@ import pt.ulisboa.tecnico.ist.cmu.locmess.exception.DuplicateExecutionException;
 import pt.ulisboa.tecnico.ist.cmu.locmess.exception.LoginFailedException;
 import pt.ulisboa.tecnico.ist.cmu.locmess.exception.CommandNotExecutedException;
 import pt.ulisboa.tecnico.ist.cmu.locmess.exception.NoNetworksAroundException;
+import pt.ulisboa.tecnico.ist.cmu.locmess.wifiDirect.WifiP2PHandler;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -48,26 +49,9 @@ public class MainActivity extends AppCompatActivity {
         /*getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);*/
         setContentView(R.layout.activity_main);
-
-
-/*
-        final Handler h = new Handler();
-        h.postDelayed(new Runnable()
-        {
-            private long time = 0;
-
-            @Override
-            public void run()
-            {
-                // do stuff then
-                // can call h again after work!
-                time += 1000;
-                Log.d("TimerExample", "Going for... " + time);
-                h.postDelayed(this, 1000);
-            }
-        }, 1000);
-
-*/
+        LocMessManager.getInstance().setWifiHandler(new WifiP2PHandler(this,new IntentFilter()));
+        WifiP2PHandler _wifiHandler=LocMessManager.getInstance().getWifiHandler();
+        _wifiHandler.wifiOn();
 
 
 
