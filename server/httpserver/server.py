@@ -299,6 +299,56 @@ class ListKeysHandler(tornado.web.RequestHandler):
             self.write(json.dumps({'type': 'listKeys','response': 'failure'}\
              ,indent=4,separators=(',', ': ')))
 
+class GetLocationHandler(tornado.web.RequestHandler):
+    def get(self):
+        try:
+            user=getUserFromToken(self.get_argument("token"))
+            finalJson={'type': 'getLocation','response': 'success'}
+            found=False
+            try:
+                global locations
+                lat=self.get_argument("latitude")
+                longitude=self.get_argument("longitude")
+                for l in locations:
+                    if l.isInside(lat,longitude):
+                        finalJson['location']=l.getName()
+                        found=True
+                if not found:
+                    try:
+                        ssid=self.get_argument("ssid")
+                        for l in locations:
+                            if l.isInsideSsid(ssid):
+                                finalJson['location']=l.getName()
+                                found=True
+                        if not found:
+                            self.write(json.dumps({'type': 'getLocation','response': 'failure','reason':'no_location'}\
+                         ,indent=4,separators=(',', ': ')))
+                            return
+                    except tornado.web.MissingArgumentError:                       
+                        self.write(json.dumps({'type': 'getLocation','response': 'failure','reason':'no_location'}\
+                         ,indent=4,separators=(',', ': ')))
+                self.write(json.dumps(finalJson))
+            except tornado.web.MissingArgumentError:
+                ssid=self.get_argument("ssid")
+                for l in locations:
+                    if l.isInsideSsid(ssid):
+                        finalJson['location']=l.getName()
+                        found=True
+                if not found:
+                    self.write(json.dumps({'type': 'getLocation','response': 'failure','reason':'no_location'}\
+                    ,indent=4,separators=(',', ': ')))    
+                    return
+                self.write(json.dumps(finalJson))   
+        except LoginError:
+            self.write(json.dumps({'type': 'getLocation','response': 'failure','reason':'incorrect_token'}\
+             ,indent=4,separators=(',', ': ')))
+        except :
+            traceback.print_exc()
+            self.write(json.dumps({'type': 'getLocation','response': 'failure'}\
+        ,indent=4,separators=(',', ': ')))
+    
+
+
 def parseIDs(ids):
     return ids.split(",")
 
@@ -326,6 +376,7 @@ def make_app():
     (r"/listMessages", ListMessagesHandler),
     (r"/addKey", AddKeyHandler),
     (r"/listKeys", ListKeysHandler),
+    (r"/getLocation",GetLocationHandler)
     ])
 
 if __name__=="__main__":
@@ -339,7 +390,9 @@ if __name__=="__main__":
     users=[newuser,]
     #logging.debug(str(newuser.add_token()))
     global locations
-    locations=[location("RNL")]
+    locations=[location(name="RNL",latitude=38.73884333333333,longitude=-9.137808333333334,radius=20,ssids=["eduroam"])]
+    #locations=[location(name="RNL",ssids=["eduroam"])]
+
     if len(sys.argv)>1 :
         PORT=int(sys.argv[1])
     app.listen(PORT)
