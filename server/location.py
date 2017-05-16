@@ -11,7 +11,7 @@ class location:
         self.ssids=ssids
         self.latitude=latitude
         self.longitude=longitude
-        self.radius=radius
+        self.radius=radius/111000
         self.messages={}
         self.messageIds=0
 
@@ -63,6 +63,19 @@ class location:
         finalJson={'bssids':self.bssids,\
         'ssids':self.ssids,'latitude':self.latitude,'longitude':self.longitude,'radius':self.radius,'name':self.name}
         return finalJson
+
+    def isInside(self,lat,longitude):
+        if float(lat)<=float(self.latitude)+float(self.radius) and float(longitude)<=float(self.longitude)+float(self.radius) and \
+        float(lat)>=float(self.latitude)-float(self.radius) and float(longitude)>=float(self.longitude)-float(self.radius):
+            return True
+        else:
+            return False
+
+    def isInsideSsid(self,ssid):
+        for s in self.ssids:
+            if s == ssid:
+                return True
+        return False
 
     def __cmp__(self,location):
         return True if self.name==location.name else False
