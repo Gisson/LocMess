@@ -19,6 +19,7 @@ import android.widget.Toast;
 import org.json.JSONException;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -29,6 +30,8 @@ import pt.ulisboa.tecnico.ist.cmu.locmess.commands.GetLocationCommand;
 import pt.ulisboa.tecnico.ist.cmu.locmess.commands.ListMessagesCommand;
 import pt.ulisboa.tecnico.ist.cmu.locmess.commands.LoginUserCommand;
 import pt.ulisboa.tecnico.ist.cmu.locmess.dto.MessageDto;
+import pt.ulisboa.tecnico.ist.cmu.locmess.dto.PolicyDto;
+import pt.ulisboa.tecnico.ist.cmu.locmess.dto.TopicDto;
 import pt.ulisboa.tecnico.ist.cmu.locmess.exception.CommandNotExecutedException;
 import pt.ulisboa.tecnico.ist.cmu.locmess.exception.DuplicateExecutionException;
 import pt.ulisboa.tecnico.ist.cmu.locmess.exception.LocMessHttpException;
@@ -60,6 +63,8 @@ public class LocMessManager {
     public WifiManager mWifiManager = null;
 //    public BatteryScannerReceiver _batteryReceiver;
     private WifiP2PHandler _wifihandler;
+    private List<TopicDto> _userTopics=null;
+
 
     protected LocMessManager(){
 
@@ -262,6 +267,38 @@ public class LocMessManager {
     public void setWifiHandler(WifiP2PHandler handler){
         _wifihandler = handler;
     }
+
+    public void setUserTopics(List<TopicDto> topics){
+        _userTopics=topics;
+    }
+
+    public void addTopic(TopicDto topic){
+        if(_userTopics == null){
+            _userTopics = new ArrayList<>();
+        }
+        _userTopics.add(topic);
+    }
+
+    public List<TopicDto> getUserTopics(){
+        if(_userTopics==null){
+            _userTopics = new ArrayList<>();
+        }
+        return _userTopics;
+    }
+
+    public boolean isMessageForMe(PolicyDto policy){
+        boolean whitelist= (policy.getType().equals(PolicyDto.WHITELIST));
+        for(TopicDto topic : policy.getTopics()){
+            if(_userTopics.contains(topic) && whitelist){
+                return true;
+            }else if(_userTopics.contains(topic) && !whitelist){
+                return false;
+            }
+        }
+        return !whitelist;
+    }
+
+
 
 
 }

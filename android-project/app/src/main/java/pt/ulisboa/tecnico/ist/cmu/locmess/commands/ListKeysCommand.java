@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import pt.ulisboa.tecnico.ist.cmu.locmess.LocMessManager;
 import pt.ulisboa.tecnico.ist.cmu.locmess.dto.TopicDto;
 import pt.ulisboa.tecnico.ist.cmu.locmess.exception.DuplicateExecutionException;
 import pt.ulisboa.tecnico.ist.cmu.locmess.exception.CommandNotExecutedException;

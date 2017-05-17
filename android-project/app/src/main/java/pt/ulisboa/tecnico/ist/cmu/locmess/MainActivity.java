@@ -25,6 +25,7 @@ import java.io.IOException;
 import pt.ulisboa.tecnico.ist.cmu.locmess.BroadcastReceivers.WifiScannerReceiver;
 import pt.ulisboa.tecnico.ist.cmu.locmess.Listeners.LocMessLocationListener;
 import pt.ulisboa.tecnico.ist.cmu.locmess.commands.AbstractCommand;
+import pt.ulisboa.tecnico.ist.cmu.locmess.commands.ListKeysCommand;
 import pt.ulisboa.tecnico.ist.cmu.locmess.commands.LoginUserCommand;
 import pt.ulisboa.tecnico.ist.cmu.locmess.exception.DuplicateExecutionException;
 import pt.ulisboa.tecnico.ist.cmu.locmess.exception.LoginFailedException;
@@ -49,9 +50,9 @@ public class MainActivity extends AppCompatActivity {
         /*getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);*/
         setContentView(R.layout.activity_main);
-        LocMessManager.getInstance().setWifiHandler(new WifiP2PHandler(this,new IntentFilter()));
-        WifiP2PHandler _wifiHandler=LocMessManager.getInstance().getWifiHandler();
-        _wifiHandler.wifiOn();
+
+
+
 
 
 

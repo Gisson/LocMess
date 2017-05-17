@@ -27,16 +27,23 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONException;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 import pt.ulisboa.tecnico.ist.cmu.locmess.LocMessActivityInterfaces.LocMessLocationNeedyActivity;
 import pt.ulisboa.tecnico.ist.cmu.locmess.adapters.MessageListAdapter;
+import pt.ulisboa.tecnico.ist.cmu.locmess.commands.ListKeysCommand;
 import pt.ulisboa.tecnico.ist.cmu.locmess.commands.ListMessagesCommand;
 import pt.ulisboa.tecnico.ist.cmu.locmess.dto.MessageDto;
+import pt.ulisboa.tecnico.ist.cmu.locmess.exception.CommandNotExecutedException;
+import pt.ulisboa.tecnico.ist.cmu.locmess.exception.DuplicateExecutionException;
 import pt.ulisboa.tecnico.ist.cmu.locmess.exception.LocMessHttpException;
 import pt.ulisboa.tecnico.ist.cmu.locmess.exception.NoNetworksAroundException;
+import pt.ulisboa.tecnico.ist.cmu.locmess.wifiDirect.WifiP2PHandler;
 
 public class MyMessagesMenuActivity extends LocMessLocationNeedyActivity
         implements NavigationView.OnNavigationItemSelectedListener{
@@ -57,6 +64,31 @@ public class MyMessagesMenuActivity extends LocMessLocationNeedyActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+
+        //START SECTION TO MOVE TO MESSAGES ACTIVITY
+        LocMessManager.getInstance().setWifiHandler(new WifiP2PHandler(this,new IntentFilter()));
+        WifiP2PHandler _wifiHandler=LocMessManager.getInstance().getWifiHandler();
+        _wifiHandler.wifiOn();
+            //(new ListKeysCommand(LocMessManager.getInstance().getToken())).execute();
+        final ListKeysCommand auxComm = new ListKeysCommand(LocMessManager.getInstance().getToken());
+            LocMessManager.getInstance().executeAsync(auxComm, new LocMessManager.CompleteCallback() {
+                @Override
+                public void OnComplete(boolean result, String message) {
+                    if (result) {
+                        try {
+                            LocMessManager.getInstance().setUserTopics(auxComm.getResultsDto());
+                        } catch (CommandNotExecutedException e) {
+                            e.printStackTrace();
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            });
+            Log.d(TAG,""+LocMessManager.getInstance().getUserTopics());
+
+
+        //END SECTION TO MOVE TO MESSAGES ACTIVITY
 
 //        LocMessManager.getInstance()._batteryReceiver = new BatteryScannerReceiver();
  //       registerReceiver(LocMessManager.getInstance()._batteryReceiver,new IntentFilter(Intent.ACTION_BATTERY_CHANGED));

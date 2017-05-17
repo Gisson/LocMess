@@ -5,6 +5,7 @@ import org.json.JSONException;
 import java.io.IOException;
 
 import pt.ulisboa.tecnico.ist.cmu.locmess.JsonParser;
+import pt.ulisboa.tecnico.ist.cmu.locmess.LocMessManager;
 import pt.ulisboa.tecnico.ist.cmu.locmess.dto.TopicDto;
 import pt.ulisboa.tecnico.ist.cmu.locmess.exception.DuplicateExecutionException;
 import pt.ulisboa.tecnico.ist.cmu.locmess.exception.CommandNotExecutedException;
@@ -23,6 +24,7 @@ public class AddKeyCommand extends AbstractCommand {
 
     public AddKeyCommand(String token, TopicDto topic) {
         super(_endpoint, "token="+token + "&key="+topic.getKey() + "&value="+topic.getValue());
+        LocMessManager.getInstance().addTopic(topic);
     }
 
     @Override
