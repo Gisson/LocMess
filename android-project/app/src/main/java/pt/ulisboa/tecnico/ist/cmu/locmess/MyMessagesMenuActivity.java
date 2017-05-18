@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import pt.ulisboa.tecnico.ist.cmu.locmess.Handlers.IncomingMessageHandler;
 import pt.ulisboa.tecnico.ist.cmu.locmess.LocMessActivityInterfaces.LocMessLocationNeedyActivity;
 import pt.ulisboa.tecnico.ist.cmu.locmess.adapters.MessageListAdapter;
 import pt.ulisboa.tecnico.ist.cmu.locmess.commands.ListKeysCommand;
@@ -43,6 +44,7 @@ import pt.ulisboa.tecnico.ist.cmu.locmess.exception.CommandNotExecutedException;
 import pt.ulisboa.tecnico.ist.cmu.locmess.exception.DuplicateExecutionException;
 import pt.ulisboa.tecnico.ist.cmu.locmess.exception.LocMessHttpException;
 import pt.ulisboa.tecnico.ist.cmu.locmess.exception.NoNetworksAroundException;
+import pt.ulisboa.tecnico.ist.cmu.locmess.services.MessageNotificationService;
 import pt.ulisboa.tecnico.ist.cmu.locmess.wifiDirect.WifiP2PHandler;
 
 public class MyMessagesMenuActivity extends LocMessLocationNeedyActivity
@@ -66,12 +68,22 @@ public class MyMessagesMenuActivity extends LocMessLocationNeedyActivity
 
 
         //START SECTION TO MOVE TO MESSAGES ACTIVITY
-        LocMessManager.getInstance().setWifiHandler(new WifiP2PHandler(this,new IntentFilter()));
-        WifiP2PHandler _wifiHandler=LocMessManager.getInstance().getWifiHandler();
-        _wifiHandler.wifiOn();
+        if(LocMessManager.getInstance().getWifiHandler() == null) {
+            LocMessManager.getInstance().setWifiHandler(new WifiP2PHandler(this, new IntentFilter()));
+            WifiP2PHandler _wifiHandler = LocMessManager.getInstance().getWifiHandler();
+            _wifiHandler.wifiOn();
+        }
+        if(LocMessManager.getInstance().getMessageHandler()==null) {
+            LocMessManager.getInstance().setMessageHandler(new IncomingMessageHandler(this));
+            IncomingMessageHandler _messageHandler = LocMessManager.getInstance().getMessageHandler();
+            _messageHandler.doBindService();
+        }
             //(new ListKeysCommand(LocMessManager.getInstance().getToken())).execute();
         final ListKeysCommand auxComm = new ListKeysCommand(LocMessManager.getInstance().getToken());
             LocMessManager.getInstance().executeAsync(auxComm, new LocMessManager.CompleteCallback() {
+                @Override
+                public void OnPreExecute(){}
+
                 @Override
                 public void OnComplete(boolean result, String message) {
                     if (result) {
@@ -144,6 +156,9 @@ public class MyMessagesMenuActivity extends LocMessLocationNeedyActivity
             //Run in Manager and catch errors
             LocMessManager.getInstance().executeAsync(command, new LocMessManager.CompleteCallback() {
                 @Override
+                public void OnPreExecute(){}
+
+                @Override
                 public void OnComplete(boolean result, String message) {
                     if (result) {
                         Toast.makeText(MyMessagesMenuActivity.this, "Success", Toast.LENGTH_SHORT).show();
@@ -156,14 +171,16 @@ public class MyMessagesMenuActivity extends LocMessLocationNeedyActivity
         }
     }
     private void  populateData(){
+        ArrayList<MessageDto> messages = new ArrayList<>();
+        messagesAdapter = new MessageListAdapter(messages, this);
         try {
             //Parse received messages
-            ArrayList<MessageDto> messages = new ArrayList<>();
+
             Map<String, MessageDto> bla = command.getResults();
             for (MessageDto m : command.getResults().values()) {
                 messages.add(m);
             }
-            messagesAdapter = new MessageListAdapter(messages, this);
+            messagesAdapter.notifyDataSetChanged();
             ListView messagesList = (ListView) findViewById(R.id.messages_list);
             messagesList.setAdapter(messagesAdapter);
             ((FloatingActionButton) findViewById(R.id.add_message)).setOnClickListener(new View.OnClickListener() {
@@ -180,6 +197,11 @@ public class MyMessagesMenuActivity extends LocMessLocationNeedyActivity
             //Still not receiving the messages? I need to fix this...
             Log.e("MESSAGES", "Request success but we do not receive any messages");
             e.printStackTrace();
+        }finally{
+            for(MessageDto messageDto : LocMessManager.getInstance().getMyMessages()){
+                messages.add(messageDto);
+            }
+            messagesAdapter.notifyDataSetChanged();
         }
     }
 
@@ -243,10 +265,13 @@ public class MyMessagesMenuActivity extends LocMessLocationNeedyActivity
         }
         //Run in Manager and catch errors
         LocMessManager.getInstance().executeAsync(command, new LocMessManager.CompleteCallback() {
+
+            @Override
+            public void OnPreExecute(){}
             @Override
             public void OnComplete(boolean result, String message) {
                 if(result){
-                    Toast.makeText(MyMessagesMenuActivity.this, "Success", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(MyMessagesMenuActivity.this, "Success", Toast.LENGTH_SHORT).show();
                     populateData();
                 } else {
                     Toast.makeText(MyMessagesMenuActivity.this, message, Toast.LENGTH_SHORT).show();
@@ -254,6 +279,14 @@ public class MyMessagesMenuActivity extends LocMessLocationNeedyActivity
             }
         });
     }
+
+    @Override
+    public void onDestroy(){
+        LocMessManager.getInstance().getMessageHandler().doUnbindService();
+        super.onDestroy();
+
+    }
+
 
 
 }

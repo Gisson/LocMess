@@ -15,7 +15,17 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 import android.widget.Toast;
 
+import org.json.JSONException;
+
+import pt.ulisboa.tecnico.ist.cmu.locmess.LocMessManager;
 import pt.ulisboa.tecnico.ist.cmu.locmess.R;
+import pt.ulisboa.tecnico.ist.cmu.locmess.commands.GetLocationCommand;
+import pt.ulisboa.tecnico.ist.cmu.locmess.commands.GetLocationsAroundCommand;
+import pt.ulisboa.tecnico.ist.cmu.locmess.commands.ListKeysCommand;
+import pt.ulisboa.tecnico.ist.cmu.locmess.dto.LocationDto;
+import pt.ulisboa.tecnico.ist.cmu.locmess.exception.CommandNotExecutedException;
+import pt.ulisboa.tecnico.ist.cmu.locmess.exception.NoLocationException;
+import pt.ulisboa.tecnico.ist.cmu.locmess.wifiDirect.WifiDirectMessageDto;
 
 /**
  * Created by jorge on 10/05/17.
@@ -34,12 +44,15 @@ public class GpsService extends Service {
         {
             Log.e(TAG, "LocationListener " + provider);
             mLastLocation = new Location(provider);
+            handleNewLocations(mLastLocation);
+
         }
         @Override
         public void onLocationChanged(Location location)
         {
             Log.e(TAG, "onLocationChanged: " + location);
             mLastLocation.set(location);
+            handleNewLocations(mLastLocation);
         }
         @Override
         public void onProviderDisabled(String provider)
@@ -115,8 +128,63 @@ public class GpsService extends Service {
     private void initializeLocationManager() {
         Log.e(TAG, "initializeLocationManager");
         if (mLocationManager == null) {
-            mLocationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
+            mLocationManager = (LocationManager) getApplicationContext().
+                    getSystemService(Context.LOCATION_SERVICE);
         }
+    }
+
+    public void handleNewLocations(final Location l){
+        final GetLocationCommand auxComm =
+                new GetLocationCommand(LocMessManager.getInstance().getToken(),
+                        ""+l.getLatitude(),""+l.getLongitude());
+        LocMessManager.getInstance().executeAsync(auxComm, new LocMessManager.CompleteCallback() {
+
+            @Override
+            public void OnPreExecute(){}
+            @Override
+            public void OnComplete(boolean result, String message) {
+                if (result) {
+                    try {
+                        LocationDto foundLocation = auxComm.getFullResult();
+                        for(WifiDirectMessageDto muleMessage : LocMessManager.getInstance().
+                                getAllFromLocation(foundLocation.getName())){
+                            LocMessManager.getInstance().getWifiHandler().sendMessage(muleMessage);
+                        }
+                        LocMessManager.getInstance().pushLocation(foundLocation);
+                        final GetLocationsAroundCommand getLocations =
+                                new GetLocationsAroundCommand(foundLocation.getName());
+                        LocMessManager.getInstance().executeAsync(
+                                getLocations,new LocMessManager.CompleteCallback(){
+                                    @Override
+                                    public void OnPreExecute(){}
+                                    @Override
+                                    public void OnComplete(boolean result, String message) {
+                                        LocMessManager.getInstance().setAroundLocations(
+                                                getLocations.getResults());
+                                    }
+                                });
+                    } catch (CommandNotExecutedException e) {
+                        e.printStackTrace();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    } catch (NoLocationException e) {
+                        final GetLocationsAroundCommand getLocations =
+                                new GetLocationsAroundCommand(""+l.getLatitude(),
+                                        ""+l.getLongitude(),"10000" );
+                        LocMessManager.getInstance().executeAsync(
+                                getLocations,new LocMessManager.CompleteCallback(){
+                                    @Override
+                                    public void OnPreExecute(){}
+                                    @Override
+                                    public void OnComplete(boolean result, String message) {
+                                        LocMessManager.getInstance().setAroundLocations(
+                                                getLocations.getResults());
+                                    }
+                                });
+                    }
+                }
+            }
+        });
     }
 
 

@@ -14,8 +14,9 @@ import java.util.List;
 public class LocationDto implements LocMessDto {
 
     private String _name;
-    private String _lat="",_longitude="",_radius="";
+    private String _radius="";
     private List<String> _wifiIds=null;
+    private GpsPointDto _center;
 
     public static class JsonAtributes{
         public static final String NAME="name";
@@ -30,14 +31,14 @@ public class LocationDto implements LocMessDto {
 
     public LocationDto(String name, String lat, String longitude, String radius){
         _name=name;
-        _lat=lat;
-        _longitude=longitude;
+        _center=new GpsPointDto(Double.parseDouble(lat),Double.parseDouble(longitude));
         _radius=radius;
     }
 
     public LocationDto(String name, List<String> wifiIds){
         _name=name;
         _wifiIds=wifiIds;
+        _center=new GpsPointDto();
     }
 
     @Deprecated
@@ -45,6 +46,8 @@ public class LocationDto implements LocMessDto {
         _name=name;
         _wifiIds=new ArrayList<>();
         wifiids=wifi;
+        _center=new GpsPointDto();
+
     }
 
 
@@ -53,11 +56,11 @@ public class LocationDto implements LocMessDto {
     }
 
     public String getLat() {
-        return _lat;
+        return ""+_center.getLatitude();
     }
 
     public String getLongitude() {
-        return _longitude;
+        return ""+_center.getLongitude();
     }
 
     public String getRadius() {
@@ -85,11 +88,16 @@ public class LocationDto implements LocMessDto {
     }
 
     public String toJson(){
+
+        return getJsonObject().toString();
+    }
+
+    public JSONObject getJsonObject(){
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put(JsonAtributes.NAME, _name);
-            jsonObject.put(JsonAtributes.LATITUDE, _lat);
-            jsonObject.put(JsonAtributes.LONGITUDE, _longitude);
+            jsonObject.put(JsonAtributes.LATITUDE, getLat());
+            jsonObject.put(JsonAtributes.LONGITUDE, getLongitude());
             JSONArray arr = new JSONArray();
             for(String wifiid : _wifiIds) {
                 arr.put(wifiid);
@@ -98,6 +106,6 @@ public class LocationDto implements LocMessDto {
         } catch (JSONException e) {
             e.toString();
         }
-        return jsonObject.toString();
+        return jsonObject;
     }
 }

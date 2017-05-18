@@ -45,6 +45,11 @@ public class TopicDto implements LocMessDto {
     }
 
     public String toJson(){
+
+        return getJsonObject().toString();
+    }
+
+    public JSONObject getJsonObject(){
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put(JsonAtributes.KEY, key);
@@ -52,6 +57,6 @@ public class TopicDto implements LocMessDto {
         } catch (JSONException e) {
             e.toString();
         }
-        return jsonObject.toString();
+        return jsonObject;
     }
 }

@@ -64,7 +64,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter></activity>
         <service android:name="pt.inesc.termite.wifidirect.service.SimWifiP2pService" />
-
+        <service android:name="pt.ulisboa.tecnico.ist.cmu.locmess.services.MessageNotificationService" android:process=":remote" />
 
     </application>
 

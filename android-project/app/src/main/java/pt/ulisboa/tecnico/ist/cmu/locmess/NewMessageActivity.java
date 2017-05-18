@@ -21,8 +21,10 @@ import java.util.List;
 
 import pt.ulisboa.tecnico.ist.cmu.locmess.commands.AbstractCommand;
 import pt.ulisboa.tecnico.ist.cmu.locmess.commands.PostMessageCommand;
+import pt.ulisboa.tecnico.ist.cmu.locmess.dto.MessageDto;
 import pt.ulisboa.tecnico.ist.cmu.locmess.dto.PolicyDto;
 import pt.ulisboa.tecnico.ist.cmu.locmess.dto.TopicDto;
+import pt.ulisboa.tecnico.ist.cmu.locmess.wifiDirect.WifiDirectMessageDto;
 
 
 public class NewMessageActivity extends AppCompatActivity {
@@ -134,23 +136,38 @@ public class NewMessageActivity extends AppCompatActivity {
         EditText content = (EditText) findViewById(R.id.message_content);
         EditText title = (EditText) findViewById(R.id.message_title_et);
         EditText lifespan = (EditText) findViewById(R.id.message_lifespan);
-        command = new PostMessageCommand(LocMessManager.getInstance().getToken(),location.getText().toString().trim(),
-                                            content.getText().toString().trim(),title.getText().toString(),
-                                            mode.getSelectedItem().toString(),_policy,
-                                            lifespan.getText().toString().trim());//Mock stuff
+        if(mode.getSelectedItem().toString().equals("Decentralized")){
+            LocMessManager.getInstance().getWifiHandler().sendMessage(
+                    new WifiDirectMessageDto(LocMessManager.getInstance().getUsername(),
+                           content.getText().toString(),title.getText().toString(),
+                            location.getText().toString(),_policy));
+            Log.d(TAG,"Using decentralized mode");
+        }else if(mode.getSelectedItem().toString().equals("Centralized")) {
+            Log.d(TAG,"Using centralized server mode");
+            command = new PostMessageCommand(LocMessManager.getInstance().getToken(),
+                    location.getText().toString().trim(),
+                    content.getText().toString().trim(), title.getText().toString(),
+                    mode.getSelectedItem().toString(), _policy,
+                    lifespan.getText().toString().trim());//Mock stuff
 
-        //Run in Manager and catch errors
-        LocMessManager.getInstance().executeAsync(command, new LocMessManager.CompleteCallback() {
-            @Override
-            public void OnComplete(boolean result, String message) {
-                if(result){
-                    Toast.makeText(NewMessageActivity.this, "Success", Toast.LENGTH_SHORT).show();
-                    finish();
-                } else {
-                    Toast.makeText(NewMessageActivity.this, message, Toast.LENGTH_SHORT).show();
+            //Run in Manager and catch errors
+            LocMessManager.getInstance().executeAsync(command, new LocMessManager.CompleteCallback() {
+                @Override
+                public void OnPreExecute(){}
+                @Override
+                public void OnComplete(boolean result, String message) {
+                    if (result) {
+                        //Toast.makeText(NewMessageActivity.this, "Success", Toast.LENGTH_SHORT).show();
+                        finish();
+                    } else {
+                        Toast.makeText(NewMessageActivity.this, message, Toast.LENGTH_SHORT).show();
+                    }
                 }
-            }
-        });
+            });
+        }else{
+            Log.wtf(TAG,"UNRECOGNIZED MODE!");
+        }
+        finish();
     }
 
     @Override

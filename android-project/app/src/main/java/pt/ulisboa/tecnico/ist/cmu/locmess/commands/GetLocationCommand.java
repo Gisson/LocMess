@@ -1,11 +1,13 @@
 package pt.ulisboa.tecnico.ist.cmu.locmess.commands;
 
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.List;
 
 import pt.ulisboa.tecnico.ist.cmu.locmess.JsonParser;
+import pt.ulisboa.tecnico.ist.cmu.locmess.dto.LocationDto;
 import pt.ulisboa.tecnico.ist.cmu.locmess.dto.TopicDto;
 import pt.ulisboa.tecnico.ist.cmu.locmess.exception.CommandNotExecutedException;
 import pt.ulisboa.tecnico.ist.cmu.locmess.exception.DuplicateExecutionException;
@@ -45,12 +47,17 @@ public class GetLocationCommand extends AbstractCommand {
 
     public String getResult() throws CommandNotExecutedException, NoLocationException, JSONException {
         try {
-            return JsonParser.getValue(super.getResponse(),"location");
+            return (new JSONObject(super.getResponse()).getJSONObject("location")).getString("name");
         } catch (JSONException e) {
             throw new NoLocationException(JsonParser.getValue(super.getResponse(),"reason"));
         }
     }
 
+    public LocationDto getFullResult() throws CommandNotExecutedException, NoLocationException, JSONException {
+        JSONObject jsonObject = new JSONObject(getResult());
+        return (new LocationDto(jsonObject.getString("name"),jsonObject.getString("latitude"),
+                jsonObject.getString("longitude"),jsonObject.getString("radius")));
+    }
     private static String getSSidString(List<String> ssids){
         String result="";
         for(int i=0;i<ssids.size()-1;i++){

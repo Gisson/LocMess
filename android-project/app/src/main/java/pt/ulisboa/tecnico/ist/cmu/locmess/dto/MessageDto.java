@@ -1,8 +1,11 @@
 package pt.ulisboa.tecnico.ist.cmu.locmess.dto;
 
+import android.util.Log;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,7 +13,7 @@ import java.util.List;
  * Created by ist179042 on 20/04/17.
  */
 
-public class MessageDto implements LocMessDto {
+public class MessageDto implements LocMessDto, Serializable {
 
     private String _author;
     private String _message;
@@ -18,8 +21,7 @@ public class MessageDto implements LocMessDto {
     private String _location;
     private PolicyDto _policy;
     private String _deliveryMode;
-    public static final String CENTRALIZED="Centralized";
-    public static final String DECENTRALIZED="Decentralized";
+    private final String _centralization="Centralized";
 
     public static class JsonAtributes{
         public static final String AUTHOR="author";
@@ -66,11 +68,15 @@ public class MessageDto implements LocMessDto {
             jsonObject.put(JsonAtributes.MESSAGE,_message);
             jsonObject.put(JsonAtributes.TITLE,_title);
             jsonObject.put(JsonAtributes.LOCATION,_location);
-            jsonObject.put(JsonAtributes.POLICY,_policy.toJson());
+            jsonObject.put(JsonAtributes.POLICY,_policy.getJsonObject());
         } catch (JSONException e) {
             e.toString();
         }
         return jsonObject.toString();
+    }
+
+    public String getCentralization(){
+        return _centralization;
     }
 
 

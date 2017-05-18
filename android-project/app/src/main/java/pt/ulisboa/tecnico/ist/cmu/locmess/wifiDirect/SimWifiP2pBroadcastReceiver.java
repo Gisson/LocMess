@@ -16,10 +16,12 @@ import pt.inesc.termite.wifidirect.SimWifiP2pInfo;
 public class SimWifiP2pBroadcastReceiver  extends BroadcastReceiver {
 
     private Activity _activity;
+    private WifiP2PHandler _handler;
 
-    public SimWifiP2pBroadcastReceiver(Activity activity){
+    public SimWifiP2pBroadcastReceiver(Activity activity,WifiP2PHandler handler){
         super();
         _activity=activity;
+        _handler=handler;
     }
 
     @Override
@@ -36,6 +38,7 @@ public class SimWifiP2pBroadcastReceiver  extends BroadcastReceiver {
 
             }
         } else if (SimWifiP2pBroadcast.WIFI_P2P_PEERS_CHANGED_ACTION.equals(action)) {
+            _handler.peersChanged();
             Toast.makeText(_activity, "Peer list changed",
                 Toast.LENGTH_SHORT).show();
 
@@ -55,5 +58,9 @@ public class SimWifiP2pBroadcastReceiver  extends BroadcastReceiver {
                     Toast.LENGTH_SHORT).show();
 
         }
+    }
+
+    public void setHandler(WifiP2PHandler handler) {
+        _handler = handler;
     }
 }

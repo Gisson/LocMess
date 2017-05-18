@@ -77,6 +77,9 @@ public class MainActivity extends AppCompatActivity {
         command=new LoginUserCommand(username, passwd);
         LocMessManager.getInstance().executeAsync(command, new LocMessManager.CompleteCallback() {
             @Override
+            public void OnPreExecute(){Toast.makeText(MainActivity.this,"Authenticating",Toast.LENGTH_SHORT);}
+
+            @Override
             public void OnComplete(boolean result, String message) {
                 if(result){
                     login();

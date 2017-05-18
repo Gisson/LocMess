@@ -73,6 +73,9 @@ public class AddLocationActivity extends AppCompatActivity {
 
             //We Running async task in Manager and catch errors
             LocMessManager.getInstance().executeAsync(command, new LocMessManager.CompleteCallback() {
+
+                @Override
+                public void OnPreExecute(){}
                 @Override
                 public void OnComplete(boolean result, String message) {
                     if(validateRequest()){

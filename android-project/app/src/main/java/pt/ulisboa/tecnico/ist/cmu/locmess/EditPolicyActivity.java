@@ -67,7 +67,7 @@ public class EditPolicyActivity extends AppCompatActivity {
     @Override
     public void onBackPressed(){
         Intent returnIntent = new Intent();
-        returnIntent.putExtra("policyType",policyChoice);
+        returnIntent.putExtra("policyType",(policyChoice+"list").toLowerCase());
         returnIntent.putExtra("topics",topics);
         setResult(RESULT_OK,returnIntent);
         finish();

@@ -12,6 +12,7 @@ import android.os.AsyncTask;
 import android.os.IBinder;
 import android.os.Messenger;
 import android.util.Log;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -22,7 +23,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import pt.inesc.termite.wifidirect.SimWifiP2pBroadcast;
 import pt.inesc.termite.wifidirect.SimWifiP2pDevice;
@@ -44,7 +47,8 @@ import pt.ulisboa.tecnico.ist.cmu.locmess.dto.TopicDto;
  * Created by jorge on 16/05/17.
  */
 
-public class WifiP2PHandler implements SimWifiP2pManager.PeerListListener, SimWifiP2pManager.GroupInfoListener {
+public class WifiP2PHandler implements SimWifiP2pManager.PeerListListener,
+        SimWifiP2pManager.GroupInfoListener {
 
     private static final String TAG="WifiP2PHandler";
 
@@ -57,6 +61,8 @@ public class WifiP2PHandler implements SimWifiP2pManager.PeerListListener, SimWi
     private SimWifiP2pManager _manager = null;
     private SimWifiP2pSocketServer _servSocket = null;
     private SimWifiP2pSocket _cliSocket = null;
+    private HashMap<String,String> _connectedDevices;
+    private List<String> _nearbyAvailable;
     private ServiceConnection mConnection = new ServiceConnection() {
         // callbacks for service binding, passed to bindService()
 
@@ -85,8 +91,10 @@ public class WifiP2PHandler implements SimWifiP2pManager.PeerListListener, SimWi
         _filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_PEERS_CHANGED_ACTION);
         _filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_NETWORK_MEMBERSHIP_CHANGED_ACTION);
         _filter.addAction(SimWifiP2pBroadcast.WIFI_P2P_GROUP_OWNERSHIP_CHANGED_ACTION);
-        _receiver = new SimWifiP2pBroadcastReceiver(_activity);
+        _receiver = new SimWifiP2pBroadcastReceiver(_activity,this);
         _activity.registerReceiver(_receiver,_filter);
+        _connectedDevices=new HashMap<>();
+        _nearbyAvailable=new ArrayList<>();
     }
 
 
@@ -94,29 +102,20 @@ public class WifiP2PHandler implements SimWifiP2pManager.PeerListListener, SimWi
 
     @Override
     public void onPeersAvailable(SimWifiP2pDeviceList peers) {
-        StringBuilder peersStr = new StringBuilder();
-
+        Log.d(TAG,"Triggered peers ");
+        _nearbyAvailable.clear();
         // compile list of devices in range
         for (SimWifiP2pDevice device : peers.getDeviceList()) {
-            String devstr = "" + device.deviceName + " (" + device.getVirtIp() + ")\n";
-            peersStr.append(devstr);
+            _nearbyAvailable.add(device.getVirtIp());
+            Log.d(TAG,"Adding nearby "+device.getVirtIp());
         }
 
-        // display list of devices in range
-        new AlertDialog.Builder(_activity)
-                .setTitle("Devices in WiFi Range")
-                .setMessage(peersStr.toString())
-                .setNeutralButton("Dismiss", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                    }
-                })
-                .show();
     }
 
     @Override
     public void onGroupInfoAvailable(SimWifiP2pDeviceList devices,
                                      SimWifiP2pInfo groupInfo) {
-
+        Log.d(TAG,"Triggered groupinfo ");
         // compile list of network members
         StringBuilder peersStr = new StringBuilder();
         for (String deviceName : groupInfo.getDevicesInNetwork()) {
@@ -124,17 +123,10 @@ public class WifiP2PHandler implements SimWifiP2pManager.PeerListListener, SimWi
             String devstr = "" + deviceName + " (" +
                     ((device == null)?"??":device.getVirtIp()) + ")\n";
             peersStr.append(devstr);
+            _connectedDevices.put(deviceName,device.getVirtIp());
+            Log.d(TAG,"Adding connected "+device.getVirtIp());
         }
 
-        // display list of network members
-        new AlertDialog.Builder(_activity)
-                .setTitle("Devices in WiFi Network")
-                .setMessage(peersStr.toString())
-                .setNeutralButton("Dismiss", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                    }
-                })
-                .show();
     }
 
 
@@ -145,7 +137,7 @@ public class WifiP2PHandler implements SimWifiP2pManager.PeerListListener, SimWi
             @Override
             protected Void doInBackground(String... msg) {
                 try {
-                    Log.d(TAG,"Sending message! ");
+                    Log.d(TAG,"Sending message to "+msg[0]);
                     _cliSocket= new SimWifiP2pSocket(msg[0],10001);
                     if(_cliSocket == null){
                         Log.w(TAG,"No such user!");
@@ -250,29 +242,49 @@ public class WifiP2PHandler implements SimWifiP2pManager.PeerListListener, SimWi
                             WifiDirectMessageDto.JsonAtributes.AUTHOR));
                     Log.d(TAG,"TTL: "+jsonObject.getInt(
                             WifiDirectMessageDto.JsonAtributes.TTL));
-                    Log.d(TAG,"Policy: "+jsonObject.getJSONObject(
-                                        WifiDirectMessageDto.JsonAtributes.POLICY));
-                    Log.d(TAG,"Topics: "+jsonObject.getJSONObject(
-                            WifiDirectMessageDto.JsonAtributes.POLICY).
-                            getJSONArray(PolicyDto.JsonAtributes.TOPICS));
+                    Log.d(TAG,"Policy: "+ new JSONObject(values[0].substring(values[0].indexOf("{"),
+                            values[0].lastIndexOf("}")+1)));
+    //                Log.d(TAG,"Topics: "+""+jsonObject.getJSONObject(
+      //                      WifiDirectMessageDto.JsonAtributes.POLICY).
+        //                    getJSONArray(PolicyDto.JsonAtributes.TOPICS));
                     JSONArray arr= jsonObject.getJSONObject(
                             WifiDirectMessageDto.JsonAtributes.POLICY).
                             getJSONArray(PolicyDto.JsonAtributes.TOPICS);
                     List<TopicDto> topics=new ArrayList<>();
                     String type=jsonObject.getJSONObject(WifiDirectMessageDto.JsonAtributes.POLICY).
                             getString(PolicyDto.JsonAtributes.TYPE);
+                    String location=jsonObject.getString(WifiDirectMessageDto.JsonAtributes.LOCATION);
                     for(int i=0;i<arr.length();i++){
-                        topics.add(new TopicDto(arr.getString(i)));
+                        topics.add(new TopicDto(arr.getJSONObject(i).getString(
+                                TopicDto.JsonAtributes.KEY),arr.getJSONObject(i).getString(
+                                TopicDto.JsonAtributes.VALUE)));
                     }
-                    if(LocMessManager.getInstance().isMessageForMe(new PolicyDto(type,topics))){
-                        Log.d(TAG,"MESSAGE IS FOR ME!");
+                    String author =jsonObject.getString(WifiDirectMessageDto.JsonAtributes.AUTHOR);
+                    String message=jsonObject.getString(WifiDirectMessageDto.JsonAtributes.MESSAGE);
+                    String title=jsonObject.getString(WifiDirectMessageDto.JsonAtributes.TITLE);
+                    if(LocMessManager.getInstance().getLastLocation().equals(location)) {
+
+                        if (LocMessManager.getInstance().isMessageForMe(new PolicyDto(type, topics))) {
+                            Log.d(TAG, "MESSAGE IS FOR ME!");
+                            WifiDirectMessageDto messageDto = new WifiDirectMessageDto(author,message,title,location,
+                            new PolicyDto(type,topics));
+                            LocMessManager.getInstance().pushMyMessage(messageDto);
+                            LocMessManager.getInstance().getMessageHandler().receiveMessage(messageDto);
+                        } else {
+                            Log.d(TAG, "Its not for me :(");
+                        }
                     }else{
-                        Log.d(TAG,"Its not for me :(");
+                        Log.d(TAG,"Not from here");
+                        if(jsonObject.getInt(WifiDirectMessageDto.JsonAtributes.TTL)<=1){
+                            Log.d(TAG,"End of the line for this message...");
+                            return;
+                        }
+                        LocMessManager.getInstance().pushMuleMessage(
+                                new WifiDirectMessageDto(author,message,title,location,
+                                        new PolicyDto(type,topics)));
+
                     }
-                    if(jsonObject.getInt(WifiDirectMessageDto.JsonAtributes.TTL)<=1){
-                        Log.d(TAG,"End of the line for this message...");
-                        return;
-                    }
+
                     Log.d(TAG,"The message must go on!");
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -305,12 +317,31 @@ public class WifiP2PHandler implements SimWifiP2pManager.PeerListListener, SimWi
 
     //Author is the actual author of the message, userFrom is the IP from where the message comes
 
-    public void sendMessage(String locationName, String content, String title, PolicyDto policy
-                            ,String deliveryMode, String duration, String userTo, String author,String sendTo){
-        WifiDirectMessageDto message = new WifiDirectMessageDto(author,content,title,locationName,policy,userTo);
-        new SendCommTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,sendTo,message.toJson());
-
+    public void sendMessage(MessageDto message,String userTo, int ttl){
+        if(_bound) {
+            WifiDirectMessageDto wifimessage = new WifiDirectMessageDto(message, userTo, ttl);
+            for(String ip : _connectedDevices.values()){
+                new SendCommTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,
+                        ip, wifimessage.toJson());
+            }
+        }else{
+            Log.w(TAG,"Service not bound");
+        }
     }
+    public void sendMessage(WifiDirectMessageDto message){
+        if(_bound) {
+            for(String ip : _nearbyAvailable){
+                Log.d(TAG,"Message to "+ip);
+                new SendCommTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,
+                        ip, message.toJson());
+                Log.i(TAG,"Sent: "+message.toJson());
+            }
+        }else{
+            Log.w(TAG,"Service not bound");
+        }
+    }
+
+
 
     public void wifiOn() {
         if (_bound)
@@ -328,6 +359,11 @@ public class WifiP2PHandler implements SimWifiP2pManager.PeerListListener, SimWi
             _activity.unbindService(mConnection);
             _bound = false;
         }
+    }
+
+    public void peersChanged(){
+        Toast.makeText(_activity,"New peers available",Toast.LENGTH_SHORT).show();
+        LocMessManager.getInstance().getWifiHandler().requestPeers(this);
     }
 
 

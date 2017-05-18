@@ -32,18 +32,22 @@ public class PolicyDto implements LocMessDto {
     public List<TopicDto> getTopics(){return _topics;}
 
     public String toJson(){
+        return getJsonObject().toString();
+    }
+
+    public JSONObject getJsonObject(){
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put(JsonAtributes.TYPE, _type);
             JSONArray arr = new JSONArray();
             for(TopicDto topic : _topics) {
-                arr.put(topic.toJson());
+                arr.put(topic.getJsonObject());
             }
             jsonObject.put(JsonAtributes.TOPICS,arr);
         } catch (JSONException e) {
             e.toString();
         }
-        return jsonObject.toString();
+        return jsonObject;
     }
 
 }

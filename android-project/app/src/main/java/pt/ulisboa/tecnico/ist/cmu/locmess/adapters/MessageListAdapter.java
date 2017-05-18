@@ -94,7 +94,7 @@ public class MessageListAdapter extends BaseAdapter {
         int index;
     }
 
-    public void showEditTopicDialog(final int index, final String title) {
+    private void showEditTopicDialog(final int index, final String title) {
         final AlertDialog.Builder builder = new AlertDialog.Builder(_activity);
         builder.setTitle(title);
 
@@ -104,7 +104,8 @@ public class MessageListAdapter extends BaseAdapter {
         dialogText.setText("Author: "+_messages.get(index).getAuthor()+"\nContent: "+_messages.get(index).getMessage()
                             +"\nLocation: "+_messages.get(index).getLocation()+"\nTopics: "+
                             _messages.get(index).getPolicy().getTopics().toString()+"\nType: "+
-                            _messages.get(index).getPolicy().getType());
+                            _messages.get(index).getPolicy().getType()+
+                            "\nCentralization: "+_messages.get(index).getCentralization());
 
         builder.setView(view1);
         builder.show();

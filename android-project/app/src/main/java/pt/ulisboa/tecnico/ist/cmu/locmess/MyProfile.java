@@ -57,6 +57,9 @@ public class MyProfile extends AppCompatActivity {
 
         final ListKeysCommand request = new ListKeysCommand(manager.getToken());
         manager.executeAsync(request, new LocMessManager.CompleteCallback() {
+
+            @Override
+            public void OnPreExecute(){}
             @Override
             public void OnComplete(final boolean result, String message) {
                 if(result) {
@@ -93,6 +96,9 @@ public class MyProfile extends AppCompatActivity {
                 String text = topics.get(index);
                 AddKeyCommand request = new AddKeyCommand(token, new TopicDto(text));
                 manager.executeAsync(request, new LocMessManager.CompleteCallback() {
+
+                    @Override
+                    public void OnPreExecute(){}
                     @Override
                     public void OnComplete(final boolean result, String message) {
                         int duration = Toast.LENGTH_SHORT;
